@@ -33,6 +33,16 @@ notebook_path = "_output/01_example_notebook_interactive.ipynb"
 
 [dataframes]
 
+[dataframes.ravenpack]
+data_sources = ["WRDS"]
+data_providers = ["RavenPack"]
+how_is_pulled = "src/pull_ravenpack.py"
+path_to_parquet_data = "_data/RAVENPACK.parquet"
+
 
 [charts]
 
+[charts.ravenpack_news_timing]
+chart_name = "Overnight vs Intraday RavenPack News"
+short_description_chart = "Daily proportion of RavenPack headlines posted outside vs inside market hours (ET), with average lines."
+path_to_html_chart = "_output/ravenpack_overnight_intraday_proportion.html"
