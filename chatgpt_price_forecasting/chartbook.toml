@@ -10,39 +10,53 @@ logo_path = ""
 favicon_path = ""
 
 [pipeline]
-id = "CH"
+id = "SL&TH"
 pipeline_name = "ChatGPT Price Forecasting"
 pipeline_description = "A project to replicate an analysis of ChatGPT-4 price forecasting"
 lead_pipeline_developer = "Tom&Sophie"
 contributors = ["Tom&Sophie"]
 software_modules_command = "module load anaconda3/3.11.4 TeXLive/2023"
 runs_on_grid_or_windows_or_other = "Windows/Linux/MacOS"
-git_repo_URL = ""
+git_repo_URL = "github.com/thomashillenbrand/p05_lopez-lira_tang_2023"
 README_file_path = "./README.md"
 
 [notebooks]
 
 
-[notebooks.01_example_notebook_interactive]
-notebook_name = "Example Notebook Interactive"
-notebook_description = "Example notebook for demonstrating how to construct a Chartbook notebook."
-notebook_path = "_output/01_example_notebook_interactive.ipynb"
-
-
-
-
 [dataframes]
 
 [dataframes.ravenpack]
+dataframe_id = "ravenpack"
 data_sources = ["WRDS"]
 data_providers = ["RavenPack"]
+dataframe_docs_str = "Dataframe showing Ravenpack data split out as intraday or overnight news"
 how_is_pulled = "src/pull_ravenpack.py"
 path_to_parquet_data = "_data/RAVENPACK.parquet"
+date_col = "date_et"
+
+[dataframes.crsp_daily_stock]
+dataframe_id = "crsp_daily_stock"
+dataframe_docs_str = "This dataframe contains daily stock data from CRSP, including closing prices and other relevant fields."
+data_sources = ["WRDS"]
+data_providers = ["CRSP"]
+how_is_pulled = "src/pull_CRSP_stock.py"
+path_to_parquet_data = "_data/CRSP_stock_daily.parquet"
+date_col = "dlycaldt"
+
 
 
 [charts]
 
 [charts.ravenpack_news_timing]
+dataframe_id = "ravenpack"
 chart_name = "Overnight vs Intraday RavenPack News"
+chart_docs_str = "Overnight vs Intraday RavenPack News"
 short_description_chart = "Daily proportion of RavenPack headlines posted outside vs inside market hours (ET), with average lines."
 path_to_html_chart = "_output/ravenpack_overnight_intraday_proportion.html"
+
+[charts.crsp_daily_stock]
+dataframe_id = "crsp_daily_stock"
+chart_docs_str = "A timeseries of adjusted daily closing price for 3 major stocks"
+chart_name = "Daily Closing Prices"
+short_description_chart = "A timeseries of adjusted daily closing price for 3 major stocks"
+path_to_html_chart = "_output/crsp_daily_closing_prices.html"
