@@ -38,27 +38,28 @@ def pull_CRSP_daily_file(
 
     query = f"""
     SELECT
-        PERMNO,
-        PERMCO,
-        Ticker,
-        PrimaryExch,
-        DlyCalDt,
-        DlyCap,
-        DlyPrc,
-        DlyRet,
-        DlyRetx,
-        DlyOpen,
-        DlyHigh,
-        DlyLow,
-        DlyClose
+        permno,
+        permco,
+        ticker,
+        primaryexch,
+        dlycaldt,
+        dlycap,
+        dlyprc,
+        dlyopen,
+        dlyhigh,
+        dlylow,
+        dlyclose,
+        dlyfacprc,
+        dlyret,
+        dlyretx
     FROM CRSPM.DSF_V2
     WHERE 
     ( 
-        PrimaryExch IN ( 'N', 'A', 'Q' ) AND
-        ConditionalType = 'RW' AND
-        TradingStatusFlg = 'A' AND
-        DlyCalDt >= '{start_date}' AND
-        DlyCalDt <= '{end_date}'
+        primaryexch IN ( 'N', 'A', 'Q' ) AND
+        conditionaltype = 'RW' AND
+        tradingstatusflg = 'A' AND
+        dlycaldt >= '{start_date}' AND
+        dlycaldt <= '{end_date}'
         {permno_filter}
     ) ; 
     """
@@ -68,7 +69,15 @@ def pull_CRSP_daily_file(
     print(f"Permnos filter: {permno_filter if permnos else 'None'}")
 
     db = wrds.Connection(wrds_username=wrds_username)
-    df = db.raw_sql(query, date_cols=["DlyCalDt"])
+    df = db.raw_sql(query, date_cols=["dlycaldt"])
+    
+    df['daily_cum_price_adj_factor'] = df['dlyfacprc'].cumprod()
+    df['dlyprc_adj'] = df['dlyprc'] * df['daily_cum_price_adj_factor']
+    df['dlyopen_adj'] = df['dlyopen'] * df['daily_cum_price_adj_factor']
+    df['dlyhigh_adj'] = df['dlyhigh'] * df['daily_cum_price_adj_factor']
+    df['dlylow_adj'] = df['dlylow'] * df['daily_cum_price_adj_factor']
+    df['dlyclose_adj'] = df['dlyclose'] * df['daily_cum_price_adj_factor']
+    
     db.close()
     return df
 
