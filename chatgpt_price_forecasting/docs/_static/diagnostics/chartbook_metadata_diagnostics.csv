@@ -1,0 +1,6 @@
+Name,Metadata Complete,Object Type,Identifier,Pipeline,Missing Fields,Page Link
+ChatGPT Price Forecasting,False,pipeline,SL&TH,SL&TH,"build_commands, os_compatibility",../index.html
+ravenpack,False,dataframe,ravenpack,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/ravenpack.html
+crsp_daily_stock,False,dataframe,crsp_daily_stock,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/crsp_daily_stock.html
+Overnight vs Intraday RavenPack News,False,chart,ravenpack_news_timing,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.ravenpack_news_timing.html
+Daily Closing Prices,False,chart,crsp_daily_stock,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.crsp_daily_stock.html
