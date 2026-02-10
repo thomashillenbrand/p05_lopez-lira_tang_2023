@@ -15,7 +15,7 @@ WRDS_USERNAME = config("WRDS_USERNAME")
 START_DATE = config("START_DATE")
 END_DATE = config("END_DATE")
 
-def pull_CRSP_daily_file(
+def pull_crsp_daily_file(
     start_date=START_DATE, end_date=END_DATE, permnos=None, wrds_username=WRDS_USERNAME
 ):
     """
@@ -82,7 +82,7 @@ def pull_CRSP_daily_file(
     return df
 
 
-def load_CRSP_daily_file(data_dir=DATA_DIR):
+def load_crsp_daily_file(data_dir=DATA_DIR):
     """
     Method to load the CRSP daily stock data from a parquet file.
     
@@ -99,6 +99,6 @@ def load_CRSP_daily_file(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     # hardcoding these three permnos for now (HW3), but will want to pull all stocks for replication
-    crsp_df = pull_CRSP_daily_file(permnos=[10107, 93436, 14593])
+    crsp_df = pull_crsp_daily_file(permnos=[10107, 93436, 14593])
     crsp_path = Path(DATA_DIR) / "CRSP_stock_daily.parquet"
     crsp_df.to_parquet(crsp_path)
