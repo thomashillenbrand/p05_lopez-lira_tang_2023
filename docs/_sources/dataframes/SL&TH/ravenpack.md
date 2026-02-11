@@ -84,7 +84,7 @@ $ __index_level_0__                 <i64> 0
 | How is data pulled?            | src/pull_ravenpack.py                                                    |
 | Data available up to (min)     | N/A (large file)                                                             |
 | Data available up to (max)     | N/A (large file)                                                             |
-| Dataframe Path                 | /Users/sophielara/Library/CloudStorage/OneDrive-TheUniversityofChicago/UChicago/2025/winter/FINM 32900/hw3/p05_lopez-lira_tang_2023/chatgpt_price_forecasting/_data/RAVENPACK.parquet                                                   |
+| Dataframe Path                 | /home/tomhillenbrand/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/RAVENPACK.parquet                                                   |
 
 
 **Linked Charts:**
@@ -102,8 +102,8 @@ $ __index_level_0__                 <i64> 0
 | Lead Pipeline Developer         | Tom&Sophie             |
 | Contributors                    | Tom&Sophie           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
-| Pipeline Web Page               | <a href="file:///Users/sophielara/Library/CloudStorage/OneDrive-TheUniversityofChicago/UChicago/2025/winter/FINM 32900/hw3/p05_lopez-lira_tang_2023/chatgpt_price_forecasting/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-02-10 17:19:47           |
+| Pipeline Web Page               | <a href="file:///home/tomhillenbrand/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
+| Date of Last Code Update        | 2026-02-10 19:39:21           |
 | OS Compatibility                |  |
 | Linked Dataframes               |  [SL&TH:ravenpack](../dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)<br>  |
 
