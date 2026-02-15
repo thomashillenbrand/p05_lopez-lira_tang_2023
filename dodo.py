@@ -150,6 +150,41 @@ def task_pull():
         "file_dep": ["./src/settings.py", "./src/pull_ravenpack.py"],
         "clean": [],
     }
+    yield {
+        "name": "CRSP_unique_tickers",
+        "doc": "Pull unique CRSP tickers from WRDS",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/pull_crsp_unique_tickers.py",
+        ],
+        "targets": [DATA_DIR / "CRSP_unique_tickers.parquet"],
+        "file_dep": ["./src/settings.py", "./src/pull_crsp_unique_tickers.py"],
+        "clean": [],
+    }
+
+def task_process():
+    """Data cleaning and processing steps"""
+
+    yield {
+        "name": "clean_ravenpack",
+        "doc": "Filter RavenPack to CRSP universe and apply OSA firm-day dedupe",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/clean_ravenpack.py",
+        ],
+        "targets": [DATA_DIR / "RAVENPACK_cleaned.parquet"],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/clean_ravenpack.py",
+            DATA_DIR / "RAVENPACK.parquet",
+            DATA_DIR / "CRSP_unique_tickers.parquet",
+        ],
+        "task_dep": [
+            "pull:ravenpack",
+            "pull:crsp_stock",
+        ],
+        "clean": [],
+    }
 
 
 def task_charts():
