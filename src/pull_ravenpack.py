@@ -31,6 +31,7 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
     WITH id AS (
       SELECT rp_entity_id, entity_type, entity_name, ticker, cusip, isin
       FROM ravenpack_common.wrds_rpa_company_mappings
+      WHERE entity_type = 'COMP'
     ),
     rp AS (
       SELECT * FROM ravenpack_dj.rpa_djpr_equities_2021
@@ -58,6 +59,19 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
         ON rp.rp_entity_id = id.rp_entity_id
       WHERE rp.rpa_date_utc BETWEEN '{start}'::date AND '{end}'::date
         AND rp.relevance = 100
+        AND rp.event_similarity_days > 90
+
+        -- paper: keep only complete articles + press releases
+        AND rp.news_type IN ('PRESS-RELEASE', 'FULL-ARTICLE')
+
+        -- paper: exclude stock-gain / stock-loss
+        AND (rp.category IS NULL OR rp.category NOT IN ('stock-gain', 'stock-loss'))
+
+        -- extra guardrail to drop price-move-only feeds (based on your diagnostics)
+        AND (rp."group" IS NULL OR rp."group" <> 'stock-prices')
+
+        -- ensure it's a mapped company entity
+        AND id.rp_entity_id IS NOT NULL
     )
     SELECT *
     FROM ranked
@@ -65,9 +79,12 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
     """
 
     db = wrds.Connection(wrds_username=wrds_username)
-    df = db.raw_sql(query)
+    df = db.raw_sql(query, date_cols=["rpa_date_utc", "timestamp_utc"])
     db.close()
     return df
+
+
+
 
 ##there are still many more observations in the ravenpack data than in the paper
 ##we can filter out some of companies keeping those that are present in the CRSP data
