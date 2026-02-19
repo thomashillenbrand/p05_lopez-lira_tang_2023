@@ -67,6 +67,8 @@ MANUAL_DATA_DIR = config("MANUAL_DATA_DIR")
 OUTPUT_DIR = config("OUTPUT_DIR")
 OS_TYPE = config("OS_TYPE")
 USER = config("USER")
+START_DATE = config("START_DATE")
+END_DATE = config("END_DATE")
 
 ## Helpers for handling Jupyter Notebook tasks
 environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
@@ -185,6 +187,48 @@ def task_process():
         ],
         "clean": [],
     }
+
+    yield {
+        "name": "submit_headlines_to_openai",
+        "doc": "Submit cleaned RavenPack headlines via OpenAI batch and aggregate ticker-day polarity",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/submit_headlines_to_openai.py",
+        ],
+        "targets": [
+            DATA_DIR / "openai_headline_batch_output.jsonl"
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/submit_headlines_to_openai.py",
+            DATA_DIR / "RAVENPACK_cleaned.parquet",
+        ],
+        "task_dep": [
+            "process:clean_ravenpack",
+        ],
+        "clean": [],
+    }
+    
+    # yield {
+    #     "name": "process_openai_responses",
+    #     "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
+    #     "actions": [
+    #         "ipython ./src/settings.py",
+    #         "ipython ./src/process_openai_responses.py",
+    #     ],
+    #     "targets": [
+    #         DATA_DIR / "daily_headline_polarity.parquet"
+    #     ],
+    #     "file_dep": [
+    #         "./src/settings.py",
+    #         "./src/process_openai_responses.py",
+    #         DATA_DIR / "openai_headline_batch_output.jsonl",
+    #     ],
+    #     "task_dep": [
+    #         "process:submit_headlines_to_openai",
+    #     ],
+    #     "clean": []
+    # }
 
 
 def task_charts():
