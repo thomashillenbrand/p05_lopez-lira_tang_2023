@@ -33,6 +33,7 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
     ),
     rp AS (
       SELECT rp_entity_id,
+             entity_id,
              rpa_date_utc,
              timestamp_utc,
              headline,
@@ -62,6 +63,7 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
     ranked AS (
       SELECT
         rp.rp_entity_id,
+        rp.entity_id,
         rp.rpa_date_utc,
         rp.timestamp_utc,
         id.ticker AS map_ticker,
@@ -83,6 +85,7 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
         AND rp.timestamp_utc IS NOT NULL
     )
     SELECT rp_entity_id,
+           entity_id,
            rpa_date_utc,
            timestamp_utc,
            map_ticker,
