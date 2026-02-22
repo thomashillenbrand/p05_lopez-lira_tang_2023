@@ -30,6 +30,7 @@ SYSTEM_PROMPT = (
 
 
 def get_input_path() -> Path:
+    """Helper method to get the input path for RavenPack cleaned parquet, with error handling."""
     if INPUT_CANDIDATE.exists():
         return INPUT_CANDIDATE
     tried = str(INPUT_CANDIDATE)
@@ -39,6 +40,16 @@ def get_input_path() -> Path:
 
 
 def pick_column(df: pd.DataFrame, options: list[str], required: bool = True) -> str | None:
+    """Helper method to pick the first matching column from a list of options, with error handling.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to check for columns.
+        options (list[str]): List of column name options to look for.
+        required (bool): Whether at least one column must be found. If True and no columns are found, raises KeyError.
+
+    Returns:
+        str | None: The name of the first matching column found, or None if no columns are found and required is False.
+    """
     for col in options:
         if col in df.columns:
             return col
@@ -48,6 +59,15 @@ def pick_column(df: pd.DataFrame, options: list[str], required: bool = True) -> 
 
 
 def make_requests_jsonl(df: pd.DataFrame, model: str) -> dict[str, dict[str, str]]:
+    """Helper method to create the JSONL file of requests for OpenAI batch, and build the id to row mapping.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the RavenPack headlines data.
+        model (str): The OpenAI model to specify in the request body.
+
+    Returns:
+        dict[str, dict[str, str]]: A mapping of custom_id to original row data (ticker, date, entity_name) for later reference.
+    """
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     timestamp_col = pick_column(df, ["timestamp_utc"])
@@ -128,6 +148,14 @@ def make_requests_jsonl(df: pd.DataFrame, model: str) -> dict[str, dict[str, str
 
 
 def upload_batch_file(client: OpenAI) -> str:
+    """Helper method to upload the JSONL file of requests to OpenAI and return the file ID.
+
+    Args:
+        client (OpenAI): An instance of the OpenAI client.
+
+    Returns:
+        str: The file ID of the uploaded batch file.
+    """
     with REQUESTS_JSONL.open("rb") as fp:
         uploaded = client.files.create(
             file=fp,
@@ -139,6 +167,15 @@ def upload_batch_file(client: OpenAI) -> str:
 
 
 def create_batch_job(client: OpenAI, input_file_id: str) -> str:
+    """Helper method to create an OpenAI batch job with the given input file ID.
+
+    Args:
+        client (OpenAI): An instance of the OpenAI client.
+        input_file_id (str): The file ID of the uploaded batch file containing the requests.
+
+    Returns:
+        str: The batch job ID of the created batch job.
+    """
     batch = client.batches.create(
         input_file_id=input_file_id,
         endpoint="/v1/chat/completions",
@@ -151,6 +188,17 @@ def create_batch_job(client: OpenAI, input_file_id: str) -> str:
 
 
 def poll_for_batch_job(client: OpenAI, batch_id: str, poll_seconds: int = 15):
+    """Helper method to poll for the status of the OpenAI batch job until it reaches a terminal state,
+    then return the batch data.
+    
+    Args:
+        client (OpenAI): An instance of the OpenAI client.
+        batch_id (str): The batch job ID to poll for.
+        poll_seconds (int): The number of seconds to wait between polling attempts.
+
+    Returns:
+        Batch: The retrieved batch data when it reaches a terminal state.
+    """
     terminal_states = {"completed", "failed", "expired", "cancelled"}
     while True:
         data = client.batches.retrieve(batch_id)
@@ -162,6 +210,13 @@ def poll_for_batch_job(client: OpenAI, batch_id: str, poll_seconds: int = 15):
 
 
 def download_file_content(client: OpenAI, file_id: str, out_path: Path) -> None:
+    """Helper method to download the content of a file from OpenAI given its file ID, and save it to the specified path.
+
+    Args:
+        client (OpenAI): An instance of the OpenAI client.
+        file_id (str): The file ID of the file to download.
+        out_path (Path): The local path where the downloaded file content should be saved.
+    """
     file_content = client.files.content(file_id)
     if hasattr(file_content, "read"):
         content_bytes = file_content.read()
@@ -179,6 +234,7 @@ def download_file_content(client: OpenAI, file_id: str, out_path: Path) -> None:
 
 
 def main():
+    """Main method to drive the process of creating, submitting, and downloading the OpenAI batch job and its results."""
     if not OPENAI_API_KEY:
         raise EnvironmentError("OPENAI_API_KEY is not set in the environment.")
 
