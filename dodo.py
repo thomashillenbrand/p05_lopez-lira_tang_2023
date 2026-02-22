@@ -16,7 +16,6 @@ from os import environ, getcwd, path
 from pathlib import Path
 
 from colorama import Fore, Style, init
-
 ## Custom reporter: Print PyDoit Text in Green
 # This is helpful because some tasks write to sterr and pollute the output in
 # the console. I don't want to mute this output, because this can sometimes
@@ -25,7 +24,6 @@ from colorama import Fore, Style, init
 # to easily see the task lines printed by PyDoit. I want them to stand out
 # from among all the other lines printed to the console.
 from doit.reporter import ConsoleReporter
-
 from settings import config
 
 try:
@@ -209,26 +207,26 @@ def task_process():
         "clean": [],
     }
     
-    # yield {
-    #     "name": "process_openai_responses",
-    #     "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
-    #     "actions": [
-    #         "ipython ./src/settings.py",
-    #         "ipython ./src/process_openai_responses.py",
-    #     ],
-    #     "targets": [
-    #         DATA_DIR / "daily_headline_polarity.parquet"
-    #     ],
-    #     "file_dep": [
-    #         "./src/settings.py",
-    #         "./src/process_openai_responses.py",
-    #         DATA_DIR / "openai_headline_batch_output.jsonl",
-    #     ],
-    #     "task_dep": [
-    #         "process:submit_headlines_to_openai",
-    #     ],
-    #     "clean": []
-    # }
+    yield {
+        "name": "process_openai_responses",
+        "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/process_openai_responses.py",
+        ],
+        "targets": [
+            DATA_DIR / "daily_headline_polarity.parquet"
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/process_openai_responses.py",
+            OUTPUT_DIR / "openai_headline_batch_output.jsonl",
+        ],
+        "task_dep": [
+            "process:submit_headlines_to_openai",
+        ],
+        "clean": []
+    }
 
 
 def task_charts():
