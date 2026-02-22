@@ -47,6 +47,7 @@ def response_to_score(label: str) -> int:
     
     Args:
         label (str): The YES/NO/UNKNOWN label to convert.
+
     Returns:
         int: 1 for YES, -1 for NO, 0 for UNKNOWN or anything else.
     """
