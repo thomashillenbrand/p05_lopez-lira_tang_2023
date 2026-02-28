@@ -181,6 +181,28 @@ def task_process():
         ],
         "task_dep": [
             "pull:ravenpack",
+            "pull:crsp_unique_tickers",
+        ],
+        "clean": [],
+    }
+
+    yield {
+        "name": "clean_crsp",
+        "doc": "Filter CRSP to RavenPack universe based on unique tickers",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/clean_crsp.py",
+        ],
+        "targets": [DATA_DIR / "CRSP_clean_daily.parquet"],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/clean_crsp.py",
+            DATA_DIR / "RAVENPACK_cleaned.parquet",
+            DATA_DIR / "CRSP_stock_daily.parquet",
+        ],
+        "task_dep": [
+            "pull:ravenpack",
+            "process:clean_ravenpack",
             "pull:crsp_stock",
         ],
         "clean": [],
