@@ -12,7 +12,6 @@ DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 
 #these are the dates they mention in the paper, oct 2021 to may 2024
-#but bc ravepack is stored in yearly tables, 
 START_DATE = datetime.strptime("2021-10-01", "%Y-%m-%d")
 END_DATE = datetime.strptime("2024-05-31", "%Y-%m-%d")
 
@@ -20,7 +19,6 @@ db = wrds.Connection(wrds_username=WRDS_USERNAME)
 
 #two main steps to filter with sql: using only relevance = 100 per the paper
 #and removing duplicate news stories tagged with the same event similarity key
-
 def pull_ravenpack(wrds_username=WRDS_USERNAME):
     print("Pulling Ravenpack data from WRDS...", flush=True)
 
@@ -29,51 +27,69 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
 
     query = f"""
     WITH id AS (
-      SELECT rp_entity_id, entity_type, entity_name, ticker, cusip, isin
+      SELECT rp_entity_id, ticker
       FROM ravenpack_common.wrds_rpa_company_mappings
       WHERE entity_type = 'COMP'
     ),
     rp AS (
-      SELECT * FROM ravenpack_dj.rpa_djpr_equities_2021
+      SELECT rp_entity_id,
+             entity_id,
+             rpa_date_utc,
+             timestamp_utc,
+             headline,
+             relevance,
+             event_similarity_key,
+             event_similarity_days,
+             news_type,
+             category,
+             "group"
+      FROM ravenpack_dj.rpa_djpr_equities_2021
       UNION ALL
-      SELECT * FROM ravenpack_dj.rpa_djpr_equities_2022
+      SELECT rp_entity_id, rpa_date_utc, timestamp_utc, headline,
+             relevance, event_similarity_key, event_similarity_days,
+             news_type, category, "group"
+      FROM ravenpack_dj.rpa_djpr_equities_2022
       UNION ALL
-      SELECT * FROM ravenpack_dj.rpa_djpr_equities_2023
+      SELECT rp_entity_id, rpa_date_utc, timestamp_utc, headline,
+             relevance, event_similarity_key, event_similarity_days,
+             news_type, category, "group"
+      FROM ravenpack_dj.rpa_djpr_equities_2023
       UNION ALL
-      SELECT * FROM ravenpack_dj.rpa_djpr_equities_2024
+      SELECT rp_entity_id, rpa_date_utc, timestamp_utc, headline,
+             relevance, event_similarity_key, event_similarity_days,
+             news_type, category, "group"
+      FROM ravenpack_dj.rpa_djpr_equities_2024
     ),
     ranked AS (
       SELECT
-        rp.*,
-        id.entity_type AS map_entity_type,
-        id.entity_name AS map_entity_name,
-        id.ticker      AS map_ticker,
-        id.cusip       AS map_cusip,
-        id.isin        AS map_isin,
+        rp.rp_entity_id,
+        rp.entity_id,
+        rp.rpa_date_utc,
+        rp.timestamp_utc,
+        id.ticker AS map_ticker,
+        rp.headline,
         ROW_NUMBER() OVER (
           PARTITION BY rp.rp_entity_id, rp.event_similarity_key
           ORDER BY rp.timestamp_utc
         ) AS rn
       FROM rp
-      LEFT JOIN id
-        ON rp.rp_entity_id = id.rp_entity_id
+      LEFT JOIN id ON rp.rp_entity_id = id.rp_entity_id
       WHERE rp.rpa_date_utc BETWEEN '{start}'::date AND '{end}'::date
         AND rp.relevance = 100
         AND rp.event_similarity_days > 90
-
-        -- paper: keep only complete articles + press releases
         AND rp.news_type IN ('PRESS-RELEASE', 'FULL-ARTICLE')
-
-        -- paper: exclude stock-gain / stock-loss
         AND (rp.category IS NULL OR rp.category NOT IN ('stock-gain', 'stock-loss'))
-
-        -- extra guardrail to drop price-move-only feeds (based on your diagnostics)
         AND (rp."group" IS NULL OR rp."group" <> 'stock-prices')
-
-        -- ensure it's a mapped company entity
         AND id.rp_entity_id IS NOT NULL
+        AND rp.headline IS NOT NULL
+        AND rp.timestamp_utc IS NOT NULL
     )
-    SELECT *
+    SELECT rp_entity_id,
+           entity_id,
+           rpa_date_utc,
+           timestamp_utc,
+           map_ticker,
+           headline
     FROM ranked
     WHERE rn = 1;
     """
@@ -81,10 +97,10 @@ def pull_ravenpack(wrds_username=WRDS_USERNAME):
     db = wrds.Connection(wrds_username=wrds_username)
     df = db.raw_sql(query, date_cols=["rpa_date_utc", "timestamp_utc"])
     db.close()
+
     return df
 
-
-
+##this time only pull minimal columns that we need, hopefully helps things run a bit faster!
 
 ##there are still many more observations in the ravenpack data than in the paper
 ##we can filter out some of companies keeping those that are present in the CRSP data

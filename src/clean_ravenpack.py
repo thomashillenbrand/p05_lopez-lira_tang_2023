@@ -145,6 +145,21 @@ def main():
     print(f"Rows after OSA dedupe: {n_rows_after_osa:,}")
     print(f"Unique tickers after OSA dedupe: {n_unique_tickers_after_osa:,}")
 
+    # Step 3: Drop intraday (keep overnight only)
+    n_rows_before_timing = len(rp_final)
+    n_unique_tickers_before_timing = rp_final["map_ticker"].dropna().nunique()
+
+    ts_et = pd.to_datetime(rp_final["timestamp_utc"], utc=True).dt.tz_convert("America/New_York")
+    rp_final = rp_final.loc[(ts_et.dt.hour < 9) | (ts_et.dt.hour >= 16)]
+
+    n_rows_after_timing = len(rp_final)
+    n_unique_tickers_after_timing = rp_final["map_ticker"].dropna().nunique()
+
+    print("\n=== Step 3: After Dropping Intraday News ===")
+    print(f"Rows before timing filter (after OSA): {n_rows_before_timing:,}")
+    print(f"Rows after dropping intraday: {n_rows_after_timing:,}")
+    print(f"Unique tickers after dropping intraday: {n_unique_tickers_after_timing:,}")
+
     # Save the final output to the clean file
     rp_final.to_parquet(OUTPUT_FILE, index=False)
     print(f"\nSaved final cleaned RavenPack parquet to: {OUTPUT_FILE}")
