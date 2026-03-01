@@ -162,9 +162,12 @@ def task_pull():
         "clean": [],
     }
 
-def task_process():
-    """Data cleaning and processing steps"""
-
+def task_data_clean():
+    """
+    Data Cleaning steps.
+      - filter to CRSP universe, apply OSA firm-day deduplication,
+        remove intraday news, and other basic cleaning steps on RavenPack data
+    """
     yield {
         "name": "clean_ravenpack",
         "doc": "Filter RavenPack to CRSP universe and apply OSA firm-day dedupe",
@@ -186,6 +189,31 @@ def task_process():
         "clean": [],
     }
 
+def task_process():
+    """Data processing steps"""
+    
+    yield {
+        "name": "generate_batched_requests",
+        "doc": "Generate JSONL file(s) of batched requests for OpenAI batch",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/generate_batched_requests.py",
+        ],
+        "targets": [
+            DATA_DIR / "openai_headline_requests.jsonl",
+            DATA_DIR / "id_to_row_mapping.json",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/generate_batched_requests.py",
+            DATA_DIR / "RAVENPACK_cleaned.parquet",
+        ],
+        "task_dep": [
+            "data_clean:clean_ravenpack",
+        ],
+        "clean": [],
+    }
+
     yield {
         "name": "submit_headlines_to_openai",
         "doc": "Submit cleaned RavenPack headlines via OpenAI batch and aggregate ticker-day polarity",
@@ -199,10 +227,10 @@ def task_process():
         "file_dep": [
             "./src/settings.py",
             "./src/submit_headlines_to_openai.py",
-            DATA_DIR / "RAVENPACK_cleaned.parquet",
+            DATA_DIR / "openai_headline_requests.jsonl"
         ],
         "task_dep": [
-            "process:clean_ravenpack",
+            "process:generate_batched_requests",
         ],
         "clean": [],
     }
