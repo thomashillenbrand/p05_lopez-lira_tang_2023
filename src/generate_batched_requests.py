@@ -164,8 +164,8 @@ def main():
         chunk_size = size
         make_requests_jsonl(
             full_df, model=OPENAI_MODEL,
-requests_output_dir=REQUESTS_JSONL_BASE.with_suffix(f".1.jsonl"),
-                id_row_json_output_dir=ID_ROW_JSON_BASE.with_suffix(f".1.json"))
+            requests_output_dir=REQUESTS_JSONL_BASE.with_suffix(f".1.jsonl"),
+            id_row_json_output_dir=ID_ROW_JSON_BASE.with_suffix(f".1.json"))
     else:
         chunk_size = OPENAI_BATCH_SIZE
         print(f"Using batch chunk size of {chunk_size:,} for OpenAI submission.")

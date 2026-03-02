@@ -1,9 +1,8 @@
 import json
+import re
 import time
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
-import pandas as pd
 from openai import OpenAI
 from settings import config
 
@@ -11,13 +10,29 @@ DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 OPENAI_API_KEY = config("OPENAI_API_KEY")
 
-REQUESTS_JSONL = DATA_DIR / "openai_headline_requests.jsonl"
-BATCH_OUTPUT_JSONL = OUTPUT_DIR / "openai_headline_batch_output.jsonl"
-BATCH_ERROR_JSONL = OUTPUT_DIR / "openai_headline_batch_errors.jsonl"
-METADATA_JSON = OUTPUT_DIR / "openai_headline_batch_metadata.json"
+REQUESTS_GLOB = "openai_headline_requests.*.jsonl"
 
 
-def upload_batch_file(client: OpenAI) -> str:
+def get_request_files(data_dir: Path = DATA_DIR) -> list[tuple[int, Path]]:
+    """Find request files in the form openai_headline_requests.X.jsonl and sort by X."""
+    pattern = re.compile(r"^openai_headline_requests\.(\d+)\.jsonl$")
+    indexed_files: list[tuple[int, Path]] = []
+
+    for file_path in data_dir.glob(REQUESTS_GLOB):
+        match = pattern.match(file_path.name)
+        if match:
+            indexed_files.append((int(match.group(1)), file_path))
+
+    indexed_files.sort(key=lambda item: item[0])
+    if not indexed_files:
+        raise FileNotFoundError(
+            f"No request files found matching pattern: {data_dir / REQUESTS_GLOB}"
+        )
+
+    return indexed_files
+
+
+def upload_batch_file(client: OpenAI, request_jsonl: Path) -> str:
     """Helper method to upload the JSONL file of requests to OpenAI and return the file ID.
 
     Args:
@@ -26,13 +41,13 @@ def upload_batch_file(client: OpenAI) -> str:
     Returns:
         str: The file ID of the uploaded batch file.
     """
-    with REQUESTS_JSONL.open("rb") as fp:
+    with request_jsonl.open("rb") as fp:
         uploaded = client.files.create(
             file=fp,
             purpose="batch",
         )
     file_id = uploaded.id
-    print(f"Uploaded batch file: {file_id}")
+    print(f"Uploaded batch file {request_jsonl.name}: {file_id}")
     return file_id
 
 
@@ -57,26 +72,33 @@ def create_batch_job(client: OpenAI, input_file_id: str) -> str:
     return batch_id
 
 
-def poll_for_batch_job(client: OpenAI, batch_id: str, poll_seconds: int = 15):
-    """Helper method to poll for the status of the OpenAI batch job until it reaches a terminal state,
-    then return the batch data.
-    
-    Args:
-        client (OpenAI): An instance of the OpenAI client.
-        batch_id (str): The batch job ID to poll for.
-        poll_seconds (int): The number of seconds to wait between polling attempts.
-
-    Returns:
-        Batch: The retrieved batch data when it reaches a terminal state.
-    """
+def poll_for_batch_jobs(
+    client: OpenAI,
+    batch_jobs: list[tuple[int, str]],
+    poll_seconds: int = 15,
+) -> dict[int, object]:
+    """Poll all batch jobs until each reaches a terminal state, returning data by index."""
     terminal_states = {"completed", "failed", "expired", "cancelled"}
-    while True:
-        data = client.batches.retrieve(batch_id)
-        status = data.status
-        print(f"Batch status: {status}")
-        if status in terminal_states:
-            return data
-        time.sleep(poll_seconds)
+    remaining = {idx: batch_id for idx, batch_id in batch_jobs}
+    results: dict[int, object] = {}
+
+    while remaining:
+        completed_this_round: list[int] = []
+        for idx, batch_id in remaining.items():
+            data = client.batches.retrieve(batch_id)
+            status = data.status
+            print(f"Batch {idx} status: {status}")
+            if status in terminal_states:
+                results[idx] = data
+                completed_this_round.append(idx)
+
+        for idx in completed_this_round:
+            remaining.pop(idx)
+
+        if remaining:
+            time.sleep(poll_seconds)
+
+    return results
 
 
 def download_file_content(client: OpenAI, file_id: str, out_path: Path) -> None:
@@ -109,31 +131,50 @@ def main():
         raise EnvironmentError("OPENAI_API_KEY is not set in the environment.")
 
     openai_client = OpenAI(api_key=OPENAI_API_KEY)
-    
-    input_file_id = upload_batch_file(openai_client)
-    batch_id = create_batch_job(openai_client, input_file_id)
-    batch_data = poll_for_batch_job(openai_client, batch_id)
+    request_files = get_request_files(DATA_DIR)
+    print(f"Found {len(request_files)} request file(s).")
 
-    METADATA_JSON.parent.mkdir(parents=True, exist_ok=True)
-    METADATA_JSON.write_text(
-        json.dumps(batch_data.model_dump(), indent=2, default=str),
-        encoding="utf-8",
-    )
-    print(f"Saved batch metadata to: {METADATA_JSON}")
+    batch_jobs: list[tuple[int, str]] = []
+    for idx, request_path in request_files:
+        input_file_id = upload_batch_file(openai_client, request_path)
+        batch_id = create_batch_job(openai_client, input_file_id)
+        batch_jobs.append((idx, batch_id))
 
-    status = batch_data.status
-    if status != "completed":
-        raise RuntimeError(f"Batch job did not complete successfully. Status: {status}")
+    all_batch_data = poll_for_batch_jobs(openai_client, batch_jobs)
 
-    output_file_id = batch_data.output_file_id
-    error_file_id = batch_data.error_file_id
-    if not output_file_id:
-        print("Batch completed but output_file_id is missing.")
-    else:
-        download_file_content(openai_client, output_file_id, BATCH_OUTPUT_JSONL)
-        
-    if error_file_id:
-        download_file_content(openai_client, error_file_id, BATCH_ERROR_JSONL)
+    failed_indices: list[int] = []
+    for idx, _ in request_files:
+        batch_data = all_batch_data[idx]
+        metadata_path = OUTPUT_DIR / f"openai_headline_batch_metadata.{idx}.json"
+        metadata_path.write_text(
+            json.dumps(batch_data.model_dump(), indent=2, default=str),
+            encoding="utf-8",
+        )
+        print(f"Saved batch metadata to: {metadata_path}")
+
+        status = batch_data.status
+        if status != "completed":
+            failed_indices.append(idx)
+            continue
+
+        output_file_id = batch_data.output_file_id
+        error_file_id = batch_data.error_file_id
+
+        if output_file_id:
+            output_path = OUTPUT_DIR / f"openai_headline_batch_output.{idx}.jsonl"
+            download_file_content(openai_client, output_file_id, output_path)
+        else:
+            print(f"Batch {idx} completed but output_file_id is missing.")
+
+        if error_file_id:
+            error_path = OUTPUT_DIR / f"openai_headline_batch_errors.{idx}.jsonl"
+            download_file_content(openai_client, error_file_id, error_path)
+
+    if failed_indices:
+        raise RuntimeError(
+            "Some batch jobs did not complete successfully for indices: "
+            f"{failed_indices}"
+        )
 
 
 if __name__ == "__main__":
