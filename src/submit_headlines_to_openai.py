@@ -107,8 +107,6 @@ def main():
     """Main method to drive the process of creating, submitting, and downloading the OpenAI batch job and its results."""
     if not OPENAI_API_KEY:
         raise EnvironmentError("OPENAI_API_KEY is not set in the environment.")
-    
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     openai_client = OpenAI(api_key=OPENAI_API_KEY)
     
