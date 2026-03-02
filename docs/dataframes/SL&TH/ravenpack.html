@@ -376,14 +376,67 @@ document.write(`
 <p>Dataframe showing Ravenpack data split out as intraday or overnight news</p>
 <section id="dataframe-glimpse">
 <h2>DataFrame Glimpse<a class="headerlink" href="#dataframe-glimpse" title="Link to this heading">#</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Rows: 742938
-Columns: 6
-$ rp_entity_id           &lt;str&gt; &#39;WZXP28&#39;
-$ rpa_date_utc  &lt;datetime[ns]&gt; 2023-03-13 00:00:00
-$ timestamp_utc &lt;datetime[ns]&gt; 2023-03-13 12:30:07.068000
-$ map_ticker             &lt;str&gt; &#39;CRGO&#39;
-$ entity_name            &lt;str&gt; &#39;Freightos Ltd.&#39;
-$ headline               &lt;str&gt; &#39;Freightos Announces Record Fiscal Year 2022 Results&#39;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Rows: 1738788
+Columns: 59
+$ rpa_date_utc                      &lt;str&gt; &#39;2023-02-01&#39;
+$ rpa_time_utc                      &lt;str&gt; &#39;11:15:38&#39;
+$ timestamp_utc            &lt;datetime[ns]&gt; 2023-02-01 11:15:37.880000
+$ rp_story_id                       &lt;str&gt; &#39;E56C0D7C056807A4A56FF60635B82CB7&#39;
+$ rp_entity_id                      &lt;str&gt; &#39;000127&#39;
+$ entity_type                       &lt;str&gt; &#39;COMP&#39;
+$ entity_name                       &lt;str&gt; &#39;PT Bank Syariah Indonesia Tbk&#39;
+$ country_code                      &lt;str&gt; &#39;ID&#39;
+$ relevance                         &lt;f64&gt; 100.0
+$ event_sentiment_score             &lt;f64&gt; 0.29
+$ event_relevance                   &lt;f64&gt; 100.0
+$ event_similarity_key              &lt;str&gt; &#39;3FF9DCE990FBDE92AD5BAE9B4EA6D594&#39;
+$ event_similarity_days             &lt;f64&gt; 365.0
+$ topic                             &lt;str&gt; &#39;business&#39;
+$ group                             &lt;str&gt; &#39;credit-ratings&#39;
+$ type                              &lt;str&gt; &#39;credit-rating-change&#39;
+$ sub_type                          &lt;str&gt; &#39;affirmation&#39;
+$ property                          &lt;str&gt; null
+$ fact_level                        &lt;str&gt; &#39;fact&#39;
+$ rp_position_id                    &lt;str&gt; null
+$ position_name                     &lt;str&gt; null
+$ evaluation_method                 &lt;str&gt; null
+$ maturity                          &lt;str&gt; null
+$ earnings_type                     &lt;str&gt; null
+$ event_start_date_utc     &lt;datetime[ns]&gt; null
+$ event_end_date_utc       &lt;datetime[ns]&gt; null
+$ reporting_period                  &lt;str&gt; null
+$ reporting_start_date_utc &lt;datetime[ns]&gt; null
+$ reporting_end_date_utc   &lt;datetime[ns]&gt; null
+$ related_entity                    &lt;str&gt; null
+$ relationship                      &lt;str&gt; null
+$ category                          &lt;str&gt; &#39;credit-rating-affirmation&#39;
+$ event_text                        &lt;str&gt; &quot;Fitch Affirms Bank Syariah Indonesia at &#39;AA&quot;
+$ news_type                         &lt;str&gt; &#39;PRESS-RELEASE&#39;
+$ rp_source_id                      &lt;str&gt; &#39;B5569E&#39;
+$ source_name                       &lt;str&gt; &#39;Dow Jones Newswires&#39;
+$ css                               &lt;f64&gt; 0.04
+$ nip                               &lt;f64&gt; -0.4
+$ peq                               &lt;f64&gt; 0.0
+$ bee                               &lt;f64&gt; 0.0
+$ bmq                               &lt;f64&gt; 1.0
+$ bam                               &lt;f64&gt; 0.0
+$ bca                               &lt;f64&gt; 0.0
+$ ber                               &lt;f64&gt; 0.0
+$ anl_chg                           &lt;f64&gt; 0.0
+$ mcq                               &lt;f64&gt; 1.0
+$ rp_story_event_index              &lt;f64&gt; 1.0
+$ rp_story_event_count              &lt;f64&gt; 13.0
+$ product_key                       &lt;str&gt; &#39;RPA&#39;
+$ provider_id                       &lt;str&gt; &#39;DJ&#39;
+$ provider_story_id                 &lt;str&gt; &#39;DN20230201003325&#39;
+$ headline                          &lt;str&gt; &quot;Press Release: Fitch Affirms Bank Syariah Indonesia at &#39;AA(idn)&#39;; Outlook Stable&quot;
+$ map_entity_type                   &lt;str&gt; &#39;COMP&#39;
+$ map_entity_name                   &lt;str&gt; &#39;PT Bank Syariah Indonesia Tbk&#39;
+$ map_ticker                        &lt;str&gt; &#39;BRIS.JK&#39;
+$ map_cusip                         &lt;str&gt; &#39;Y0R8KR105&#39;
+$ map_isin                          &lt;str&gt; &#39;ID1000142904&#39;
+$ rn                                &lt;i64&gt; 1
+$ __index_level_0__                 &lt;i64&gt; 0
 
 
 </pre></div>
@@ -420,13 +473,13 @@ $ headline               &lt;str&gt; &#39;Freightos Announces Record Fiscal Year
 <td><p>src/pull_ravenpack.py</p></td>
 </tr>
 <tr class="row-odd"><td><p>Data available up to (min)</p></td>
-<td><p>None</p></td>
+<td><p>N/A (large file)</p></td>
 </tr>
 <tr class="row-even"><td><p>Data available up to (max)</p></td>
-<td><p>None</p></td>
+<td><p>N/A (large file)</p></td>
 </tr>
 <tr class="row-odd"><td><p>Dataframe Path</p></td>
-<td><p>/home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/RAVENPACK.parquet</p></td>
+<td><p>/home/tomhillenbrand/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/RAVENPACK.parquet</p></td>
 </tr>
 </tbody>
 </table>
@@ -458,10 +511,10 @@ $ headline               &lt;str&gt; &#39;Freightos Announces Record Fiscal Year
 <td><p><a class="reference external" href="http://github.com/thomashillenbrand/p05_lopez-lira_tang_2023">github.com/thomashillenbrand/p05_lopez-lira_tang_2023</a></p></td>
 </tr>
 <tr class="row-even"><td><p>Pipeline Web Page</p></td>
-<td><p><a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page</p></td>
+<td><p><a href="file:///home/tomhillenbrand/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page</p></td>
 </tr>
 <tr class="row-odd"><td><p>Date of Last Code Update</p></td>
-<td><p>2026-03-01 16:22:17</p></td>
+<td><p>2026-02-10 19:39:21</p></td>
 </tr>
 <tr class="row-even"><td><p>OS Compatibility</p></td>
 <td><p></p></td>
