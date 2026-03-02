@@ -13,9 +13,9 @@ from settings import config
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
+ID_ROW_JSON = DATA_DIR / "id_to_row_mapping.json"
 SCORES_PARQUET = DATA_DIR / "daily_headline_polarity.parquet"
 BATCH_OUTPUT_JSONL = OUTPUT_DIR / "openai_headline_batch_output.jsonl"
-ID_ROW_JSON = OUTPUT_DIR / "id_to_row_mapping.json"
 
 
 def extract_response(content: str) -> str | None:
