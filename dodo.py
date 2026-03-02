@@ -189,6 +189,7 @@ def task_data_clean():
         "clean": [],
     }
 
+
 def task_process():
     """Data processing steps"""
     
@@ -200,8 +201,12 @@ def task_process():
             "ipython ./src/generate_batched_requests.py",
         ],
         "targets": [
-            DATA_DIR / "openai_headline_requests.jsonl",
-            DATA_DIR / "id_to_row_mapping.json",
+            DATA_DIR / "openai_headline_requests.1.jsonl",
+            DATA_DIR / "id_to_row_mapping.1.json",
+            DATA_DIR / "openai_headline_requests.2.jsonl",
+            DATA_DIR / "id_to_row_mapping.2.json",
+            DATA_DIR / "openai_headline_requests.3.jsonl",
+            DATA_DIR / "id_to_row_mapping.3.json"
         ],
         "file_dep": [
             "./src/settings.py",
@@ -227,7 +232,12 @@ def task_process():
         "file_dep": [
             "./src/settings.py",
             "./src/submit_headlines_to_openai.py",
-            DATA_DIR / "openai_headline_requests.jsonl"
+            DATA_DIR / "openai_headline_requests.1.jsonl",
+            DATA_DIR / "id_to_row_mapping.1.json",
+            DATA_DIR / "openai_headline_requests.2.jsonl",
+            DATA_DIR / "id_to_row_mapping.2.json",
+            DATA_DIR / "openai_headline_requests.3.jsonl",
+            DATA_DIR / "id_to_row_mapping.3.json",
         ],
         "task_dep": [
             "process:generate_batched_requests",
@@ -248,7 +258,9 @@ def task_process():
         "file_dep": [
             "./src/settings.py",
             "./src/process_openai_responses.py",
-            OUTPUT_DIR / "openai_headline_batch_output.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.1.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.2.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.3.jsonl",
         ],
         "task_dep": [
             "process:submit_headlines_to_openai",
