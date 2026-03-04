@@ -16,8 +16,7 @@ OUT_CSV = DATA_DIR / "table1_overnight_drift.csv"
 ANN_FACTOR = np.sqrt(252)
 
 
-def summarize(ret: pd.Series) -> dict:
-    """Return hit rate (%), mean return (%), annualized Sharpe, and N days."""
+def summarize(ret: pd.Series, sharpe: bool = True) -> dict:
     ret = pd.to_numeric(ret, errors="coerce").dropna()
     n = int(ret.shape[0])
     if n == 0:
@@ -26,11 +25,12 @@ def summarize(ret: pd.Series) -> dict:
     hit = 100.0 * (ret > 0).mean()
     mean = 100.0 * ret.mean()
 
+    if not sharpe:
+        return {"hit": hit, "mean": mean, "sharpe": np.nan, "n": n}
+
     sd = ret.std(ddof=1)
-    sharpe = (ANN_FACTOR * ret.mean() / sd) if (sd is not None and sd > 0) else np.nan
-
-    return {"hit": hit, "mean": mean, "sharpe": sharpe, "n": n}
-
+    sharpe_val = (ANN_FACTOR * ret.mean() / sd) if (sd is not None and sd > 0) else np.nan
+    return {"hit": hit, "mean": mean, "sharpe": sharpe_val, "n": n}
 
 def main():
     port = pd.read_parquet(PORT_PATH).sort_values("date")
@@ -38,8 +38,8 @@ def main():
     required = {
         "date",
         "ret_ls", "ret_long", "ret_short",
+        "ret_ir_ls", "ret_ir_long", "ret_ir_short",
         "trade_ls", "trade_long", "trade_short",
-        "n_total",
     }
     missing = required - set(port.columns)
     if missing:
@@ -50,25 +50,27 @@ def main():
     firm_day_obs = int(scores.shape[0])
 
     specs = [
-        ("Long-Short Portfolio", "trade_ls", "ret_ls"),
-        ("Long-Only Portfolio", "trade_long", "ret_long"),
-        ("Short-Only Portfolio", "trade_short", "ret_short"),
+        ("Long-Short Portfolio", "trade_ls", "ret_ir_ls", "ret_ls"),
+        ("Long-Only Portfolio",  "trade_long", "ret_ir_long", "ret_long"),
+        ("Short-Only Portfolio", "trade_short", "ret_ir_short", "ret_short"),
     ]
 
     rows = []
-    for name, trade_col, ret_col in specs:
-        s = summarize(port.loc[port[trade_col], ret_col])
-        rows.append(
-            {
-                "Portfolio": name,
-                "Hit Rate (%)": s["hit"],
-                "Mean Return (%)": s["mean"],
-                "Sharpe Ratio": s["sharpe"],
-                "Trading Days": s["n"],
-            }
-        )
+    for name, trade_col, ir_col, dr_col in specs:
+        ir_stats = summarize(port.loc[port[trade_col], ir_col], sharpe=False)   # no Sharpe for IR
+        dr_stats = summarize(port.loc[port[trade_col], dr_col], sharpe=True)    # Sharpe only for drift
 
-    table = pd.DataFrame(rows)
+        rows.append({
+            "Portfolio": name,
+            "Initial Reaction Hit Rate (%)": ir_stats["hit"],
+            "Initial Reaction Mean Return (%)": ir_stats["mean"],
+            "Drift Hit Rate (%)": dr_stats["hit"],
+            "Drift Mean Return (%)": dr_stats["mean"],
+            "Drift Sharpe Ratio": dr_stats["sharpe"],
+            "Trading Days": dr_stats["n"],
+        })
+
+    table = pd.DataFrame(rows)  
 
     # Summary rows similar to the paper (for overnight portion)
     summary = pd.DataFrame(
