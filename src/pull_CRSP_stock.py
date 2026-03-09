@@ -65,6 +65,7 @@ def pull_crsp_daily_file(
     db = wrds.Connection(wrds_username=wrds_username)
 
     df = db.raw_sql(query, date_cols=["dlycaldt"])
+    df["ticker"] = df["ticker"].str.strip().str.upper()
 
     # ------------------------------------------------------------------
     # Commenting out adjustment block — it made it take too long to run over all permnos
@@ -99,3 +100,9 @@ if __name__ == "__main__":
     crsp_path = Path(DATA_DIR) / "CRSP_stock_daily.parquet"
     crsp_df.to_parquet(crsp_path, index=False)
     print(f"Saved CRSP daily data to: {crsp_path}")
+     
+    unique_tickers_path = Path(DATA_DIR) / "CRSP_unique_tickers.parquet"
+    tickers_df = pd.DataFrame({'ticker': crsp_df['ticker'].unique()})
+    tickers_df.to_parquet(unique_tickers_path, index=False)
+    print(f"Saved unique tickers to: {unique_tickers_path}")
+    

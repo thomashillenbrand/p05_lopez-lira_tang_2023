@@ -135,8 +135,14 @@ def task_pull():
             "ipython ./src/settings.py",
             "ipython ./src/pull_CRSP_stock.py",
         ],
-        "targets": [DATA_DIR / "CRSP_stock_daily.parquet"],
-        "file_dep": ["./src/settings.py", "./src/pull_CRSP_stock.py"],
+        "targets": [
+            DATA_DIR / "CRSP_stock_daily.parquet",
+            DATA_DIR / "CRSP_unique_tickers.parquet"
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/pull_CRSP_stock.py"
+        ],
         "clean": [],
     }
     yield {
@@ -146,19 +152,13 @@ def task_pull():
             "ipython ./src/settings.py",
             "ipython ./src/pull_ravenpack.py",
         ],
-        "targets": [DATA_DIR / "RAVENPACK.parquet"],
-        "file_dep": ["./src/settings.py", "./src/pull_ravenpack.py"],
-        "clean": [],
-    }
-    yield {
-        "name": "CRSP_unique_tickers",
-        "doc": "Pull unique CRSP tickers from WRDS",
-        "actions": [
-            "ipython ./src/settings.py",
-            "ipython ./src/pull_crsp_unique_tickers.py",
+        "targets": [
+            DATA_DIR / "RAVENPACK.parquet"
         ],
-        "targets": [DATA_DIR / "CRSP_unique_tickers.parquet"],
-        "file_dep": ["./src/settings.py", "./src/pull_crsp_unique_tickers.py"],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/pull_ravenpack.py"
+        ],
         "clean": [],
     }
 
@@ -184,7 +184,7 @@ def task_data_clean():
         ],
         "task_dep": [
             "pull:ravenpack",
-            "pull:crsp_unique_tickers",
+            "pull:crsp_stock"
         ],
         "clean": [],
     }
@@ -205,7 +205,7 @@ def task_data_clean():
         ],
         "task_dep": [
             "pull:ravenpack",
-            "process:clean_ravenpack",
+            "data_clean:clean_ravenpack",
             "pull:crsp_stock",
         ],
         "clean": [],
