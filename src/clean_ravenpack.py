@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 
+import numpy as np
 import pandas as pd
 from rapidfuzz.distance import OSA
 
@@ -11,6 +12,16 @@ DATA_DIR = Path(config("DATA_DIR"))
 CRSP_TICKERS_FILE = DATA_DIR / "CRSP_unique_tickers.parquet"
 RAVENPACK_FILE = DATA_DIR / "RAVENPACK.parquet"
 OUTPUT_FILE = DATA_DIR / "RAVENPACK_cleaned.parquet"
+
+FINAL_COLUMN_LIST = [
+    "rp_entity_id",
+    "map_ticker",
+    "timestamp_utc",
+    "rpa_date_utc",
+    "timestamp_et",  # added ET timestamp for filtering
+    "headline_date",  # added headline date after adjusting for overnight news
+    "headline",
+]
 
 #clean tickers
 
@@ -131,7 +142,7 @@ def main():
     # Dedupe only multi-headline firm-days
     rp_multi_deduped = (
         rp_multi.groupby(["rp_entity_id", "rpa_date_utc"], group_keys=False)
-               .apply(osa_dedupe_firm_day)
+               .apply(osa_dedupe_firm_day, include_groups=False)
                .reset_index(drop=True)
     )
 
@@ -145,12 +156,19 @@ def main():
     print(f"Rows after OSA dedupe: {n_rows_after_osa:,}")
     print(f"Unique tickers after OSA dedupe: {n_unique_tickers_after_osa:,}")
 
-    # Step 3: Drop intraday (keep overnight only)
+    # Step 3: Drop intraday (keep overnight only), and assign headline date based on timestamp
     n_rows_before_timing = len(rp_final)
     n_unique_tickers_before_timing = rp_final["map_ticker"].dropna().nunique()
 
-    ts_et = pd.to_datetime(rp_final["timestamp_utc"], utc=True).dt.tz_convert("America/New_York")
-    rp_final = rp_final.loc[(ts_et.dt.hour < 9) | (ts_et.dt.hour >= 16)]
+    ts_et = pd.to_datetime(rp_final["timestamp_utc"], utc=True, errors='coerce').dt.tz_convert("America/New_York")
+    rp_final["timestamp_et"] = ts_et
+    rp_final = rp_final.loc[(rp_final["timestamp_et"].dt.hour < 9) | (rp_final["timestamp_et"].dt.hour >= 16)]
+    rp_final['headline_date'] = np.where(
+        rp_final['timestamp_et'].dt.hour >= 16,
+        rp_final['timestamp_et'].dt.date + pd.Timedelta(days=1),
+        rp_final['timestamp_et'].dt.date
+    )
+    rp_final = rp_final[FINAL_COLUMN_LIST]
 
     n_rows_after_timing = len(rp_final)
     n_unique_tickers_after_timing = rp_final["map_ticker"].dropna().nunique()
@@ -158,6 +176,7 @@ def main():
     print("\n=== Step 3: After Dropping Intraday News ===")
     print(f"Rows before timing filter (after OSA): {n_rows_before_timing:,}")
     print(f"Rows after dropping intraday: {n_rows_after_timing:,}")
+    print(f"Unique tickers before dropping intraday: {n_unique_tickers_before_timing:,}")
     print(f"Unique tickers after dropping intraday: {n_unique_tickers_after_timing:,}")
 
     # Save the final output to the clean file
