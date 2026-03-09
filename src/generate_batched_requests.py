@@ -66,24 +66,13 @@ def make_requests_jsonl(
         dict[str, dict[str, str]]: A mapping of custom_id to original row data (ticker, date, entity_name) for later reference.
     """
 
-    timestamp_col = pick_column(df, ["timestamp_utc"])
     ticker_col = pick_column(df, ["map_ticker"])
     entity_name_col = pick_column(df, ["entity_name"])
     headline_col = pick_column(df, ["headline"])
-    timestamp_et_col = 'timestamp_et'
-    date_col = 'date'
+    headline_date_col = pick_column(df, ['headline_date'])
+    date_col = pick_column(df, ["headline_date"])
     
-    # Maybe we do this part of ravenpack data cleaning?
-    ts = pd.to_datetime(df[timestamp_col], errors='coerce')
-    if ts.dt.tz is None:
-        ts = ts.dt.tz_localize('UTC')
-
-    timestamp_et = ts.dt.tz_convert(ZoneInfo('America/New_York'))
-    date_series = timestamp_et.dt.date
-
-    headlines_df = df[[ticker_col, entity_name_col, headline_col]].copy()
-    headlines_df[date_col] = date_series
-    headlines_df[timestamp_et_col] = timestamp_et
+    headlines_df = df[[ticker_col, entity_name_col, headline_col, headline_date_col]].copy()
     headlines_df = headlines_df.rename(
         columns={
             date_col: "date",
@@ -92,13 +81,6 @@ def make_requests_jsonl(
             headline_col: "headline",
         }
     )
-
-    # basic cleaning, but should be done prior.. we can remove this later
-    headlines_df["ticker"] = headlines_df["ticker"].astype(str).str.upper().str.strip()
-    headlines_df["entity_name"] = headlines_df["entity_name"].astype(str).str.strip()
-    headlines_df["headline"] = headlines_df["headline"].astype(str).str.strip()
-    headlines_df = headlines_df.dropna(subset=["date"])
-    headlines_df = headlines_df[headlines_df["headline"] != ""]
     headlines_df = headlines_df.reset_index(drop=True)
 
     id_to_row: dict[str, dict[str, str]] = {}

@@ -16,6 +16,7 @@ OUTPUT_FILE = DATA_DIR / "RAVENPACK_cleaned.parquet"
 FINAL_COLUMN_LIST = [
     "rp_entity_id",
     "map_ticker",
+    "entity_name",
     "timestamp_utc",
     "rpa_date_utc",
     "timestamp_et",  # added ET timestamp for filtering
