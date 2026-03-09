@@ -156,7 +156,7 @@ def main():
     print(f"Rows after OSA dedupe: {n_rows_after_osa:,}")
     print(f"Unique tickers after OSA dedupe: {n_unique_tickers_after_osa:,}")
 
-    # Step 3: Drop intraday (keep overnight only)
+    # Step 3: Drop intraday (keep overnight only), and assign headline date based on timestamp
     n_rows_before_timing = len(rp_final)
     n_unique_tickers_before_timing = rp_final["map_ticker"].dropna().nunique()
 
