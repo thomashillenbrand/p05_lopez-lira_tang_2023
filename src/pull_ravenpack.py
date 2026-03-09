@@ -11,8 +11,8 @@ DATA_DIR = Path(config("DATA_DIR"))
 WRDS_USERNAME = config("WRDS_USERNAME")
 
 # Dates mentioned in the paper: Oct 2021 to May 2024
-START_DATE = datetime.strptime("2021-10-01", "%Y-%m-%d")
-END_DATE = datetime.strptime("2024-05-31", "%Y-%m-%d")
+START_DATE = config("START_DATE")
+END_DATE = config("END_DATE")
 
 
 def _pick_first_existing_column(db: wrds.Connection, schema: str, table: str, candidates: list[str]) -> str | None:
@@ -38,8 +38,8 @@ def _pick_first_existing_column(db: wrds.Connection, schema: str, table: str, ca
 def pull_ravenpack(wrds_username: str = WRDS_USERNAME) -> pd.DataFrame:
     print("Pulling Ravenpack data from WRDS...", flush=True)
 
-    start = START_DATE.strftime("%Y-%m-%d")
-    end = END_DATE.strftime("%Y-%m-%d")
+    start = START_DATE
+    end = END_DATE
 
     db = wrds.Connection(wrds_username=wrds_username)
 
