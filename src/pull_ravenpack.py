@@ -139,6 +139,32 @@ def pull_ravenpack(wrds_username: str = WRDS_USERNAME) -> pd.DataFrame:
         category,
         "group"
       FROM ravenpack_dj.rpa_djpr_equities_2024
+      UNION ALL
+      SELECT
+        rp_entity_id,
+        rpa_date_utc,
+        timestamp_utc,
+        headline,
+        relevance,
+        event_similarity_key,
+        event_similarity_days,
+        news_type,
+        category,
+        "group"
+      FROM ravenpack_dj.rpa_djpr_equities_2025
+      UNION ALL
+      SELECT
+        rp_entity_id,
+        rpa_date_utc,
+        timestamp_utc,
+        headline,
+        relevance,
+        event_similarity_key,
+        event_similarity_days,
+        news_type,
+        category,
+        "group"
+      FROM ravenpack_dj.rpa_djpr_equities_2026
     ),
     ranked AS (
       SELECT
