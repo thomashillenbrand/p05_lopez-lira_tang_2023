@@ -249,7 +249,16 @@ def task_process():
             "ipython ./src/submit_headlines_to_openai.py",
         ],
         "targets": [
-            DATA_DIR / "openai_headline_batch_output.jsonl"
+            DATA_DIR / "openai_headline_batch_output.1.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.1.jsonl",
+            DATA_DIR / "openai_headline_batch_output.2.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.2.jsonl",
+            DATA_DIR / "openai_headline_batch_output.3.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.3.jsonl",
+            DATA_DIR / "openai_headline_batch_output.4.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.4.jsonl",
+            DATA_DIR / "openai_headline_batch_output.5.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.5.jsonl"
         ],
         "file_dep": [
             "./src/settings.py",
@@ -260,6 +269,11 @@ def task_process():
             DATA_DIR / "id_to_row_mapping.2.json",
             DATA_DIR / "openai_headline_requests.3.jsonl",
             DATA_DIR / "id_to_row_mapping.3.json",
+            DATA_DIR / "openai_headline_requests.4.jsonl",
+            DATA_DIR / "id_to_row_mapping.4.json",
+            DATA_DIR / "openai_headline_requests.5.jsonl",
+            DATA_DIR / "id_to_row_mapping.5.json",
+
         ],
         "task_dep": [
             "process:generate_batched_requests",
@@ -267,81 +281,81 @@ def task_process():
         "clean": [],
     }
     
-    yield {
-        "name": "process_openai_responses",
-        "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
-        "actions": [
-            "ipython ./src/settings.py",
-            "ipython ./src/process_openai_responses.py",
-        ],
-        "targets": [
-            DATA_DIR / "daily_headline_polarity.parquet"
-        ],
-        "file_dep": [
-            "./src/settings.py",
-            "./src/process_openai_responses.py",
-            OUTPUT_DIR / "openai_headline_batch_output.1.jsonl",
-            OUTPUT_DIR / "openai_headline_batch_output.2.jsonl",
-            OUTPUT_DIR / "openai_headline_batch_output.3.jsonl",
-        ],
-        "task_dep": [
-            "process:submit_headlines_to_openai",
-        ],
-        "clean": []
-    }
+    # yield {
+    #     "name": "process_openai_responses",
+    #     "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
+    #     "actions": [
+    #         "ipython ./src/settings.py",
+    #         "ipython ./src/process_openai_responses.py",
+    #     ],
+    #     "targets": [
+    #         DATA_DIR / "daily_headline_polarity.parquet"
+    #     ],
+    #     "file_dep": [
+    #         "./src/settings.py",
+    #         "./src/process_openai_responses.py",
+    #         OUTPUT_DIR / "openai_headline_batch_output.1.jsonl",
+    #         OUTPUT_DIR / "openai_headline_batch_output.2.jsonl",
+    #         OUTPUT_DIR / "openai_headline_batch_output.3.jsonl",
+    #     ],
+    #     "task_dep": [
+    #         "process:submit_headlines_to_openai",
+    #     ],
+    #     "clean": []
+    # }
 
 
-def task_charts():
-    """HW3: Generate exploratory charts (interactive HTML)"""
-    yield {
-        "name": "crsp_daily_closing_prices",
-        "actions": [
-            "ipython ./src/settings.py",
-            "ipython ./src/plot_CRSP_data.py",
-        ],
-        "targets": [OUTPUT_DIR / "crsp_daily_closing_prices.html"],
-        "file_dep": [
-            "./src/settings.py",
-            "./src/plot_CRSP_data.py",
-            DATA_DIR / "CRSP_stock_daily.parquet",
-        ],
-        "clean": True,
-    }
+# def task_charts():
+#     """HW3: Generate exploratory charts (interactive HTML)"""
+#     yield {
+#         "name": "crsp_daily_closing_prices",
+#         "actions": [
+#             "ipython ./src/settings.py",
+#             "ipython ./src/plot_CRSP_data.py",
+#         ],
+#         "targets": [OUTPUT_DIR / "crsp_daily_closing_prices.html"],
+#         "file_dep": [
+#             "./src/settings.py",
+#             "./src/plot_CRSP_data.py",
+#             DATA_DIR / "CRSP_stock_daily.parquet",
+#         ],
+#         "clean": True,
+#     }
 
-    yield {
-        "name": "ravenpack_news_timing",
-        "actions": [
-            "ipython ./src/settings.py",
-            "ipython ./src/plot_ravenpack_data.py",
-        ],
-        "targets": [OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"],
-        "file_dep": [
-            "./src/settings.py",
-            "./src/plot_ravenpack_data.py",
-            DATA_DIR / "RAVENPACK.parquet",
-        ],
-        "clean": True,
-    }
-
-
-sphinx_targets = [
-    "./docs/index.html",
-]
+#     yield {
+#         "name": "ravenpack_news_timing",
+#         "actions": [
+#             "ipython ./src/settings.py",
+#             "ipython ./src/plot_ravenpack_data.py",
+#         ],
+#         "targets": [OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"],
+#         "file_dep": [
+#             "./src/settings.py",
+#             "./src/plot_ravenpack_data.py",
+#             DATA_DIR / "RAVENPACK.parquet",
+#         ],
+#         "clean": True,
+#     }
 
 
-def task_build_chartbook_site():
-    """Compile Sphinx Docs"""
-    file_dep = [
-        "./README.md",
-        "./chartbook.toml",
-    ]
+# sphinx_targets = [
+#     "./docs/index.html",
+# ]
 
-    return {
-        "actions": [
-            "chartbook build -f",
-        ],  # Use docs as build destination
-        "targets": sphinx_targets,
-        "file_dep": file_dep,
-        "task_dep": ["charts"],
-        "clean": True,
-    }
+
+# def task_build_chartbook_site():
+#     """Compile Sphinx Docs"""
+#     file_dep = [
+#         "./README.md",
+#         "./chartbook.toml",
+#     ]
+
+#     return {
+#         "actions": [
+#             "chartbook build -f",
+#         ],  # Use docs as build destination
+#         "targets": sphinx_targets,
+#         "file_dep": file_dep,
+#         "task_dep": ["charts"],
+#         "clean": True,
+#     }
