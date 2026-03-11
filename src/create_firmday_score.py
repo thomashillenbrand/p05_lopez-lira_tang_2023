@@ -219,6 +219,14 @@ def compute_trade_date(trading_days: pd.DatetimeIndex, timestamp_et: pd.Series) 
 
     return trade
 
+def compute_trade_date_tom(trading_days: pd.DatetimeIndex, dates: pd.Series) -> pd.Series:
+    is_td = pd.Series(dates.isin(trading_days), index=dates.index)
+    result = dates.copy()
+    mask = ~is_td
+    if mask.any():
+        result.loc[mask] = [next_td(trading_days, d, strict=False) for d in dates.loc[mask]]
+    return result
+
 
 def recover_timestamps(scored: pd.DataFrame) -> pd.DataFrame:
     rp = pd.read_parquet(RAVENPACK_PATH)
@@ -265,7 +273,7 @@ def recover_timestamps(scored: pd.DataFrame) -> pd.DataFrame:
 def main():
     outputs = load_outputs()    # custom_id,label,score
     mapping = load_mapping()    # custom_id,ticker,entity_name,date (calendar)
-    requests = load_requests()  # custom_id,headline
+    # requests = load_requests()  # custom_id,headline
 
     # Merge coverage checks
     scored = outputs.merge(mapping, on="custom_id", how="left", indicator=True)
@@ -273,31 +281,31 @@ def main():
     print(scored["_merge"].value_counts(dropna=False).to_string())
     scored = scored.drop(columns=["_merge"])
 
-    scored = scored.merge(requests, on="custom_id", how="left", indicator=True)
-    print("[CHECK] after merge (prev)→requests:")
-    print(scored["_merge"].value_counts(dropna=False).to_string())
-    scored = scored.drop(columns=["_merge"])
+    # scored = scored.merge(requests, on="custom_id", how="left", indicator=True)
+    # print("[CHECK] after merge (prev)→requests:")
+    # print(scored["_merge"].value_counts(dropna=False).to_string())
+    # scored = scored.drop(columns=["_merge"])
 
     # Required fields for timestamp recovery
     before_drop = len(scored)
-    scored = scored.dropna(subset=["ticker", "entity_name", "date", "headline"])
+    scored = scored.dropna(subset=["ticker", "entity_name", "date"])
     print(f"[CHECK] rows after dropping missing ticker/entity/date/headline: {len(scored):,} (dropped {before_drop-len(scored):,})")
 
     # Timestamp recovery (key choke point)
-    scored = recover_timestamps(scored)
+    # scored = recover_timestamps(scored)
 
     # Drop rows without timestamp
     before_ts = len(scored)
-    scored = scored.dropna(subset=["timestamp_et"])
-    print(f"[CHECK] rows after dropping missing timestamp_et: {len(scored):,} (dropped {before_ts-len(scored):,})")
+    # scored = scored.dropna(subset=["timestamp_et"])
+    # print(f"[CHECK] rows after dropping missing timestamp_et: {len(scored):,} (dropped {before_ts-len(scored):,})")
 
     trading_days = load_trading_days()
 
-    scored["trade_date"] = compute_trade_date(trading_days, scored["timestamp_et"])
+    scored["trade_date"] = compute_trade_date_tom(trading_days, scored["date"])
     before_td = len(scored)
     scored = scored.dropna(subset=["trade_date"])
     print(f"[CHECK] rows after dropping missing trade_date: {len(scored):,} (dropped {before_td-len(scored):,})")
-
+    breakpoint()
     scored["date"] = pd.to_datetime(scored["trade_date"]).dt.date
 
     # Aggregate to firm-day (ticker, trade_date)
@@ -308,6 +316,7 @@ def main():
         .reset_index(drop=True)
     )
     daily["score"] = daily["score_sum"].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
+    breakpoint()
 
     print(f"[CHECK] final firm-day rows: {len(daily):,}")
     if len(daily) > 0:
