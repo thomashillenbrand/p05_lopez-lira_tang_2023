@@ -281,28 +281,30 @@ def task_process():
         "clean": [],
     }
     
-    # yield {
-    #     "name": "process_openai_responses",
-    #     "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
-    #     "actions": [
-    #         "ipython ./src/settings.py",
-    #         "ipython ./src/process_openai_responses.py",
-    #     ],
-    #     "targets": [
-    #         DATA_DIR / "daily_headline_polarity.parquet"
-    #     ],
-    #     "file_dep": [
-    #         "./src/settings.py",
-    #         "./src/process_openai_responses.py",
-    #         OUTPUT_DIR / "openai_headline_batch_output.1.jsonl",
-    #         OUTPUT_DIR / "openai_headline_batch_output.2.jsonl",
-    #         OUTPUT_DIR / "openai_headline_batch_output.3.jsonl",
-    #     ],
-    #     "task_dep": [
-    #         "process:submit_headlines_to_openai",
-    #     ],
-    #     "clean": []
-    # }
+    yield {
+        "name": "create_firm_day_score",
+        "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_firmday_score.py",
+        ],
+        "targets": [
+            DATA_DIR / "daily_headline_polarity.parquet"
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_firmday_score.py",
+            OUTPUT_DIR / "openai_headline_batch_output.1.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.2.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.3.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.4.jsonl",
+            OUTPUT_DIR / "openai_headline_batch_output.5.jsonl",
+        ],
+        "task_dep": [
+            "process:submit_headlines_to_openai",
+        ],
+        "clean": []
+    }
 
 
 # def task_charts():
