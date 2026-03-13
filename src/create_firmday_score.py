@@ -22,7 +22,6 @@ Output columns:
 
 import json
 import re
-from datetime import time as dtime
 from pathlib import Path
 from typing import Iterable
 
@@ -76,11 +75,6 @@ def label_to_score(label: str | None) -> int:
     if label == "NO":
         return -1
     return 0
-
-
-def headline_from_user_prompt(user_content: str) -> str | None:
-    m = re.search(r"\bHeadline:\s*(.*)\s*$", user_content or "", flags=re.DOTALL)
-    return m.group(1).strip() if m else None
 
 
 def load_outputs() -> pd.DataFrame:
@@ -144,38 +138,6 @@ def load_mapping() -> pd.DataFrame:
     return df[["custom_id", "ticker", "entity_name", "date"]]
 
 
-def load_requests() -> pd.DataFrame:
-    paths = sorted(DATA_DIR.glob("openai_headline_requests*.jsonl"))
-    if not paths:
-        raise FileNotFoundError(f"No request files found in {DATA_DIR} matching openai_headline_requests*.jsonl")
-
-    rows = []
-    bad = 0
-    for p in paths:
-        for obj in iter_jsonl(p):
-            cid = obj.get("custom_id")
-            body = obj.get("body") or {}
-            messages = body.get("messages") or []
-            user_content = None
-            for m in messages:
-                if m.get("role") == "user":
-                    user_content = m.get("content")
-                    break
-            hl = headline_from_user_prompt(user_content or "")
-            if cid and hl:
-                rows.append({"custom_id": cid, "headline": hl})
-            else:
-                bad += 1
-
-    df = pd.DataFrame(rows).drop_duplicates("custom_id")
-    if df.empty:
-        raise ValueError("Parsed 0 headlines from openai_headline_requests*.jsonl.")
-    df["headline"] = norm_text(df["headline"])
-
-    print(f"[CHECK] requests parsed unique custom_id: {len(df):,} (bad rows skipped={bad:,})")
-    return df
-
-
 def load_trading_days() -> pd.DatetimeIndex:
     crsp = pd.read_parquet(CRSP_PATH)
     if "date" not in crsp.columns:
@@ -196,30 +158,7 @@ def next_td(trading_days: pd.DatetimeIndex, day: pd.Timestamp, strict: bool) -> 
     return trading_days[pos] if pos < len(trading_days) else pd.NaT
 
 
-def compute_trade_date(trading_days: pd.DatetimeIndex, timestamp_et: pd.Series) -> pd.Series:
-    ts = pd.to_datetime(timestamp_et, errors="coerce")
-    if ts.dt.tz is None:
-        raise ValueError("timestamp_et must be timezone-aware (ET).")
-
-    cal_day = ts.dt.tz_convert("America/New_York").dt.normalize().dt.tz_localize(None)
-    t = ts.dt.tz_convert("America/New_York").dt.time
-
-    after_close = t >= dtime(16, 0)
-    pre_9 = t < dtime(9, 0)
-
-    is_td = pd.Series(cal_day.isin(trading_days), index=cal_day.index)
-    trade = cal_day.copy()
-
-    if after_close.any():
-        trade.loc[after_close] = [next_td(trading_days, d, strict=True) for d in cal_day.loc[after_close]]
-
-    mask = pre_9 & (~is_td)
-    if mask.any():
-        trade.loc[mask] = [next_td(trading_days, d, strict=False) for d in cal_day.loc[mask]]
-
-    return trade
-
-def compute_trade_date_tom(trading_days: pd.DatetimeIndex, dates: pd.Series) -> pd.Series:
+def compute_trade_date(trading_days: pd.DatetimeIndex, dates: pd.Series) -> pd.Series:
     is_td = pd.Series(dates.isin(trading_days), index=dates.index)
     result = dates.copy()
     mask = ~is_td
@@ -228,52 +167,9 @@ def compute_trade_date_tom(trading_days: pd.DatetimeIndex, dates: pd.Series) -> 
     return result
 
 
-def recover_timestamps(scored: pd.DataFrame) -> pd.DataFrame:
-    rp = pd.read_parquet(RAVENPACK_PATH)
-
-    need_cols = {"map_ticker", "entity_name", "headline", "timestamp_utc"}
-    if not need_cols.issubset(rp.columns):
-        raise KeyError(f"RAVENPACK_cleaned missing required columns {need_cols}. Got {set(rp.columns)}")
-
-    rp = rp[list(need_cols)].copy().rename(columns={"map_ticker": "ticker"})
-    rp["ticker"] = norm_ticker(rp["ticker"])
-    rp["entity_name"] = norm_text(rp["entity_name"])
-    rp["headline"] = norm_text(rp["headline"])
-
-    ts = pd.to_datetime(rp["timestamp_utc"], errors="coerce")
-    if ts.dt.tz is None:
-        ts = ts.dt.tz_localize("UTC")
-    rp["timestamp_et"] = ts.dt.tz_convert("America/New_York")
-    rp["date"] = rp["timestamp_et"].dt.date
-
-    key = ["ticker", "entity_name", "headline", "date"]
-
-    # Coverage check: how many rows have potential matches by ticker-date alone?
-    rp_td = rp[["ticker", "date"]].drop_duplicates()
-    scored_td = scored[["ticker", "date"]].drop_duplicates()
-    td_overlap = scored_td.merge(rp_td, on=["ticker", "date"], how="inner")
-    print(f"[CHECK] ticker-date overlap between scored rows and RavenPack: {len(td_overlap):,} unique ticker-date pairs")
-
-    out = scored.merge(rp[key + ["timestamp_et"]], on=key, how="left")
-
-    # If duplicates, keep earliest timestamp_et per custom_id
-    out = out.sort_values(["custom_id", "timestamp_et"]).groupby("custom_id", as_index=False).first()
-
-    miss = out["timestamp_et"].isna().sum()
-    print(f"[CHECK] timestamp recovery success: {(len(out) - miss):,}/{len(out):,} ({100.0*(len(out)-miss)/len(out):.2f}%)")
-    if miss:
-        # show a few unmatched examples to debug headline mismatches
-        sample = out.loc[out["timestamp_et"].isna(), ["custom_id", "ticker", "entity_name", "date", "headline"]].head(5)
-        print("[CHECK] sample unmatched rows (first 5):")
-        print(sample.to_string(index=False))
-
-    return out
-
-
 def main():
     outputs = load_outputs()    # custom_id,label,score
     mapping = load_mapping()    # custom_id,ticker,entity_name,date (calendar)
-    # requests = load_requests()  # custom_id,headline
 
     # Merge coverage checks
     scored = outputs.merge(mapping, on="custom_id", how="left", indicator=True)
@@ -281,31 +177,16 @@ def main():
     print(scored["_merge"].value_counts(dropna=False).to_string())
     scored = scored.drop(columns=["_merge"])
 
-    # scored = scored.merge(requests, on="custom_id", how="left", indicator=True)
-    # print("[CHECK] after merge (prev)→requests:")
-    # print(scored["_merge"].value_counts(dropna=False).to_string())
-    # scored = scored.drop(columns=["_merge"])
-
-    # Required fields for timestamp recovery
     before_drop = len(scored)
     scored = scored.dropna(subset=["ticker", "entity_name", "date"])
     print(f"[CHECK] rows after dropping missing ticker/entity/date/headline: {len(scored):,} (dropped {before_drop-len(scored):,})")
 
-    # Timestamp recovery (key choke point)
-    # scored = recover_timestamps(scored)
-
-    # Drop rows without timestamp
-    before_ts = len(scored)
-    # scored = scored.dropna(subset=["timestamp_et"])
-    # print(f"[CHECK] rows after dropping missing timestamp_et: {len(scored):,} (dropped {before_ts-len(scored):,})")
-
     trading_days = load_trading_days()
 
-    scored["trade_date"] = compute_trade_date_tom(trading_days, scored["date"])
+    scored["trade_date"] = compute_trade_date(trading_days, scored["date"])
     before_td = len(scored)
     scored = scored.dropna(subset=["trade_date"])
     print(f"[CHECK] rows after dropping missing trade_date: {len(scored):,} (dropped {before_td-len(scored):,})")
-    breakpoint()
     scored["date"] = pd.to_datetime(scored["trade_date"]).dt.date
 
     # Aggregate to firm-day (ticker, trade_date)
@@ -316,7 +197,6 @@ def main():
         .reset_index(drop=True)
     )
     daily["score"] = daily["score_sum"].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
-    breakpoint()
 
     print(f"[CHECK] final firm-day rows: {len(daily):,}")
     if len(daily) > 0:
