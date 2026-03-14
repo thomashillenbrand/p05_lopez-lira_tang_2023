@@ -25,12 +25,12 @@ FINAL_COLUMN_LIST = [
 ]
 
 #clean tickers
-
 def _norm_ticker_series(s: pd.Series) -> pd.Series:
     s = s.astype(str).str.upper().str.strip()
     s = s.str.replace(r"\s+", "", regex=True)
     s = s.replace({"": pd.NA, "NAN": pd.NA, "NONE": pd.NA, "NULL": pd.NA})
     return s
+
 
 #clean headlines for OSA dedupe
 def _norm_headline(s: str) -> str:
@@ -40,8 +40,7 @@ def _norm_headline(s: str) -> str:
 
 # OSA dedupe function for firm-day headlines
 # this is based on the filtering procedure in the paper where they remove headlines with OSA similarity > 0.60 to a higher-relevance headline for the same firm-day
-
-def osa_dedupe_firm_day(g: pd.DataFrame, threshold: float = 0.60) -> pd.DataFrame:
+def _osa_dedupe_firm_day(g: pd.DataFrame, threshold: float = 0.60) -> pd.DataFrame:
     """
     Firm-day headline dedupe using Optimal String Alignment similarity (0..1).
     Keeps the first headline, drops subsequent ones with similarity > threshold.
@@ -70,6 +69,56 @@ def osa_dedupe_firm_day(g: pd.DataFrame, threshold: float = 0.60) -> pd.DataFram
         return g.iloc[0:0].copy()
 
     return pd.DataFrame(kept_rows)
+
+
+def apply_osa_dedupe_firm_day(rp_filt: pd.DataFrame) -> pd.DataFrame:
+    required_cols = {"rp_entity_id", "rpa_date_utc", "timestamp_utc", "headline"}
+    missing = required_cols - set(rp_filt.columns)
+    if missing:
+        raise KeyError(
+            f"Cannot OSA-dedupe because RavenPack is missing columns: {sorted(missing)}"
+        )
+
+    print("\nApplying firm-day OSA headline dedupe (threshold > 0.60)...")
+    
+    # Optional speed-up: only apply to firm-days with >1 headline
+    sizes = rp_filt.groupby(["rp_entity_id", "rpa_date_utc"]).size()
+    multi_keys = sizes[sizes > 1].index
+
+    rp_single = rp_filt.merge(
+        pd.DataFrame(index=multi_keys).reset_index(),
+        on=["rp_entity_id", "rpa_date_utc"],
+        how="left",
+        indicator=True,
+    )
+    rp_multi = rp_single[rp_single["_merge"] == "both"].drop(columns=["_merge"])
+    rp_single = rp_single[rp_single["_merge"] == "left_only"].drop(columns=["_merge"])
+
+    # Dedupe only multi-headline firm-days
+    rp_multi_deduped = (
+        rp_multi.groupby(["rp_entity_id", "rpa_date_utc"], group_keys=False)
+               .apply(_osa_dedupe_firm_day, include_groups=False)
+               .reset_index(drop=True)
+    )
+
+    return pd.concat([rp_single, rp_multi_deduped], ignore_index=True)
+
+
+def align_headlines_to_dates(df: pd.DataFrame) -> pd.DataFrame:
+    ts_et = pd.to_datetime(df["timestamp_utc"], utc=True, errors="coerce").dt.tz_convert("America/New_York")
+    df["timestamp_et"] = ts_et
+
+    # Filter out intraday headlines (between 9:00 and 16:00 ET)
+    filtered_df = df[(df["timestamp_et"].dt.hour < 9) | (df["timestamp_et"].dt.hour >= 16)].copy()
+
+    # Assign headline_date based on timestamp
+    filtered_df["headline_date"] = np.where(
+        filtered_df["timestamp_et"].dt.hour >= 16,
+        filtered_df["timestamp_et"].dt.date + pd.Timedelta(days=1),
+        filtered_df["timestamp_et"].dt.date,
+    )
+
+    return filtered_df[FINAL_COLUMN_LIST]
 
 
 def main():
@@ -118,39 +167,10 @@ def main():
     print(f"RavenPack unique tickers (after CRSP filter): {n_unique_tickers_after_crsp:,}")
 
     # Step 2: Firm-day OSA dedupe
-    required_cols = {"rp_entity_id", "rpa_date_utc", "timestamp_utc", "headline"}
-    missing = required_cols - set(rp_filt.columns)
-    if missing:
-        raise KeyError(
-            f"Cannot OSA-dedupe because RavenPack is missing columns: {sorted(missing)}"
-        )
+    rp_deduped = apply_osa_dedupe_firm_day(rp_filt)
 
-    print("\nApplying firm-day OSA headline dedupe (threshold > 0.60)...")
-
-    # Optional speed-up: only apply to firm-days with >1 headline
-    sizes = rp_filt.groupby(["rp_entity_id", "rpa_date_utc"]).size()
-    multi_keys = sizes[sizes > 1].index
-
-    rp_single = rp_filt.merge(
-        pd.DataFrame(index=multi_keys).reset_index(),
-        on=["rp_entity_id", "rpa_date_utc"],
-        how="left",
-        indicator=True,
-    )
-    rp_multi = rp_single[rp_single["_merge"] == "both"].drop(columns=["_merge"])
-    rp_single = rp_single[rp_single["_merge"] == "left_only"].drop(columns=["_merge"])
-
-    # Dedupe only multi-headline firm-days
-    rp_multi_deduped = (
-        rp_multi.groupby(["rp_entity_id", "rpa_date_utc"], group_keys=False)
-               .apply(osa_dedupe_firm_day, include_groups=False)
-               .reset_index(drop=True)
-    )
-
-    rp_final = pd.concat([rp_single, rp_multi_deduped], ignore_index=True)
-
-    n_rows_after_osa = len(rp_final)
-    n_unique_tickers_after_osa = rp_final["map_ticker"].dropna().nunique()
+    n_rows_after_osa = len(rp_deduped)
+    n_unique_tickers_after_osa = rp_deduped["map_ticker"].dropna().nunique()
 
     print("\n=== Step 2: After OSA Dedupe ===")
     print(f"Rows before OSA (after CRSP filter): {n_rows_after_crsp:,}")
@@ -158,18 +178,10 @@ def main():
     print(f"Unique tickers after OSA dedupe: {n_unique_tickers_after_osa:,}")
 
     # Step 3: Drop intraday (keep overnight only), and assign headline date based on timestamp
-    n_rows_before_timing = len(rp_final)
-    n_unique_tickers_before_timing = rp_final["map_ticker"].dropna().nunique()
+    n_rows_before_timing = len(rp_deduped)
+    n_unique_tickers_before_timing = rp_deduped["map_ticker"].dropna().nunique()
 
-    ts_et = pd.to_datetime(rp_final["timestamp_utc"], utc=True, errors='coerce').dt.tz_convert("America/New_York")
-    rp_final["timestamp_et"] = ts_et
-    rp_final = rp_final.loc[(rp_final["timestamp_et"].dt.hour < 9) | (rp_final["timestamp_et"].dt.hour >= 16)]
-    rp_final['headline_date'] = np.where(
-        rp_final['timestamp_et'].dt.hour >= 16,
-        rp_final['timestamp_et'].dt.date + pd.Timedelta(days=1),
-        rp_final['timestamp_et'].dt.date
-    )
-    rp_final = rp_final[FINAL_COLUMN_LIST]
+    rp_final = align_headlines_to_dates(rp_deduped)
 
     n_rows_after_timing = len(rp_final)
     n_unique_tickers_after_timing = rp_final["map_ticker"].dropna().nunique()
