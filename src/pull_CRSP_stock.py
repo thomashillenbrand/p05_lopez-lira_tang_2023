@@ -67,18 +67,6 @@ def pull_crsp_daily_file(
     df = db.raw_sql(query, date_cols=["dlycaldt"])
     df["ticker"] = df["ticker"].str.strip().str.upper()
 
-    # ------------------------------------------------------------------
-    # Commenting out adjustment block — it made it take too long to run over all permnos
-    # Maybe we can optimize if we need these values for the replication ?
-    # ------------------------------------------------------------------
-
-    # df['daily_cum_price_adj_factor'] = df['dlyfacprc'].cumprod()
-    # df['dlyprc_adj'] = df['dlyprc'] * df['daily_cum_price_adj_factor']
-    # df['dlyopen_adj'] = df['dlyopen'] * df['daily_cum_price_adj_factor']
-    # df['dlyhigh_adj'] = df['dlyhigh'] * df['daily_cum_price_adj_factor']
-    # df['dlylow_adj'] = df['dlylow'] * df['daily_cum_price_adj_factor']
-    # df['dlyclose_adj'] = df['dlyclose'] * df['daily_cum_price_adj_factor']
-
     # Optional: standardize date column name for merging later
     df = df.rename(columns={"dlycaldt": "date"})
 
