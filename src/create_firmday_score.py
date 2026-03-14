@@ -33,7 +33,7 @@ DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
 RAVENPACK_PATH = DATA_DIR / "RAVENPACK_cleaned.parquet"
-CRSP_PATH = DATA_DIR / "CRSP_clean_daily.parquet"
+CRSP_PATH = DATA_DIR / "CRSP_stock_daily.parquet"
 OUT_PATH = DATA_DIR / "daily_headline_polarity.parquet"
 
 

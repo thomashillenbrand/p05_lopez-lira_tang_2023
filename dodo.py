@@ -162,7 +162,7 @@ def task_pull():
         "clean": [],
     }
 
-def task_data_clean():
+def task_clean_data():
     """
     Data Cleaning steps.
       - filter to CRSP universe, apply OSA firm-day deduplication,
@@ -189,28 +189,6 @@ def task_data_clean():
         "clean": [],
     }
 
-    yield {
-        "name": "clean_crsp",
-        "doc": "Filter CRSP to RavenPack universe based on unique tickers",
-        "actions": [
-            "ipython ./src/settings.py",
-            "ipython ./src/clean_crsp.py",
-        ],
-        "targets": [DATA_DIR / "CRSP_clean_daily.parquet"],
-        "file_dep": [
-            "./src/settings.py",
-            "./src/clean_crsp.py",
-            DATA_DIR / "RAVENPACK_cleaned.parquet",
-            DATA_DIR / "CRSP_stock_daily.parquet",
-        ],
-        "task_dep": [
-            "pull:ravenpack",
-            "data_clean:clean_ravenpack",
-            "pull:crsp_stock",
-        ],
-        "clean": [],
-    }
-
 
 def task_process():
     """Data processing steps"""
@@ -228,7 +206,11 @@ def task_process():
             DATA_DIR / "openai_headline_requests.2.jsonl",
             DATA_DIR / "id_to_row_mapping.2.json",
             DATA_DIR / "openai_headline_requests.3.jsonl",
-            DATA_DIR / "id_to_row_mapping.3.json"
+            DATA_DIR / "id_to_row_mapping.3.json",
+            DATA_DIR / "openai_headline_requests.4.jsonl",
+            DATA_DIR / "id_to_row_mapping.4.json",
+            DATA_DIR / "openai_headline_requests.5.jsonl",
+            DATA_DIR / "id_to_row_mapping.5.json"
         ],
         "file_dep": [
             "./src/settings.py",
@@ -236,7 +218,7 @@ def task_process():
             DATA_DIR / "RAVENPACK_cleaned.parquet",
         ],
         "task_dep": [
-            "data_clean:clean_ravenpack",
+            "clean_data:clean_ravenpack",
         ],
         "clean": [],
     }
