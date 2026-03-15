@@ -47,7 +47,8 @@ def get_rp_timing_stats(rp: pd.DataFrame) -> pd.DataFrame:
                 }
             )
 
-        return stats, pd.DataFrame(rows)
+        return pd.DataFrame([stats]), pd.DataFrame(rows)
+
     else:
         print("RAVENPACK_cleaned.parquet not found.")
 
@@ -76,3 +77,10 @@ def generate_single_request_jsonl(rp: pd.DataFrame):
             mapping_content = mapping_file.read_text(encoding="utf-8")
             return jsonl_content, mapping_content
             
+            
+def printable_table(df: pd.DataFrame, table_name: str) -> None:
+    print(f"\n{table_name} Data:", df.shape)
+    print("Summary:")
+    print("  > Trading Days: ", df.iloc[3]["Trading Days"])
+    print("  > Firm-Day Observations: ", int(df.iloc[3]["Firm-Day Observations"]) if df.shape[0] > 3 else "")
+    return(df.head(3).drop(columns=["Trading Days", "Firm-Day Observations"], errors="ignore"))

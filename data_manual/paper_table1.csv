@@ -1,0 +1,5 @@
+Portfolio,Initial Reaction Hit Rate (%),Initial Reaction Mean Return (%),Drift Hit Rate (%),Drift Mean Return (%),Drift Sharpe Ratio,Trading Days,Firm-Day Observations
+Long-Short Portfolio,93.28,3.06,58.06,0.34,2.97,,
+Long-Only Portfolio,83.28,1.27,50.90,0.08,0.78,,
+Short-Only Portfolio,79.40,1.79,53.58,0.26,2.01,,
+Sample Summary,,,,,,670,105742
