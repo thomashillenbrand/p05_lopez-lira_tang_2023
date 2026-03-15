@@ -9,87 +9,129 @@ from settings import config
 DATA_DIR = Path(config("DATA_DIR"))
 
 PORT_PATH = DATA_DIR / "portfolio_daily_returns.parquet"
-SCORES_PATH = DATA_DIR / "daily_headline_polarity.parquet"
-OUT_CSV = DATA_DIR / "table1_overnight_drift.csv"
+OUT_PAPER = DATA_DIR / "table1_overnight_paper_sample.csv"
+OUT_FULL = DATA_DIR / "table1_overnight_full_sample.csv"
+
+PAPER_START = pd.Timestamp("2021-10-01")
+PAPER_END = pd.Timestamp("2024-05-31")
 
 
-ANN_FACTOR = np.sqrt(252)
+def annualized_sharpe(x: pd.Series, periods_per_year: int = 252) -> float:
+    x = pd.to_numeric(x, errors="coerce").dropna()
+    if len(x) < 2:
+        return np.nan
+    sd = x.std(ddof=1)
+    if pd.isna(sd) or sd == 0:
+        return np.nan
+    return np.sqrt(periods_per_year) * x.mean() / sd
 
 
-def summarize(ret: pd.Series, sharpe: bool = True) -> dict:
-    ret = pd.to_numeric(ret, errors="coerce").dropna()
-    n = int(ret.shape[0])
-    if n == 0:
-        return {"hit": np.nan, "mean": np.nan, "sharpe": np.nan, "n": 0}
+def hit_rate(x: pd.Series) -> float:
+    x = pd.to_numeric(x, errors="coerce").dropna()
+    if len(x) == 0:
+        return np.nan
+    return (x > 0).mean() * 100.0
 
-    hit = 100.0 * (ret > 0).mean()
-    mean = 100.0 * ret.mean()
 
-    if not sharpe:
-        return {"hit": hit, "mean": mean, "sharpe": np.nan, "n": n}
+def mean_pct(x: pd.Series) -> float:
+    x = pd.to_numeric(x, errors="coerce").dropna()
+    if len(x) == 0:
+        return np.nan
+    return x.mean() * 100.0
 
-    sd = ret.std(ddof=1)
-    sharpe_val = (ANN_FACTOR * ret.mean() / sd) if (sd is not None and sd > 0) else np.nan
-    return {"hit": hit, "mean": mean, "sharpe": sharpe_val, "n": n}
 
-def main():
-    port = pd.read_parquet(PORT_PATH).sort_values("date")
+def summarize_portfolio(df: pd.DataFrame, label: str, ir_col: str, drift_col: str, trade_col: str) -> dict:
+    traded = df[df[trade_col].fillna(False)].copy()
 
-    required = {
-        "date",
-        "ret_ls", "ret_long", "ret_short",
-        "ret_ir_ls", "ret_ir_long", "ret_ir_short",
-        "trade_ls", "trade_long", "trade_short",
+    return {
+        "Portfolio": label,
+        "Initial Reaction Hit Rate (%)": hit_rate(traded[ir_col]),
+        "Initial Reaction Mean Return (%)": mean_pct(traded[ir_col]),
+        "Drift Hit Rate (%)": hit_rate(traded[drift_col]),
+        "Drift Mean Return (%)": mean_pct(traded[drift_col]),
+        "Drift Sharpe Ratio": annualized_sharpe(traded[drift_col]),
+        "Trading Days": int(traded.shape[0]),
+        "Firm-Day Observations": np.nan,  # filled only on summary row
     }
-    missing = required - set(port.columns)
-    if missing:
-        raise KeyError(f"{PORT_PATH.name} missing columns: {missing}")
 
-    # Firm-day observations (paper counts firm-day combinations incl neutrals)
-    scores = pd.read_parquet(SCORES_PATH)
-    firm_day_obs = int(scores.shape[0])
 
-    specs = [
-        ("Long-Short Portfolio", "trade_ls", "ret_ir_ls", "ret_ls"),
-        ("Long-Only Portfolio",  "trade_long", "ret_ir_long", "ret_long"),
-        ("Short-Only Portfolio", "trade_short", "ret_ir_short", "ret_short"),
+def build_table(df: pd.DataFrame) -> pd.DataFrame:
+    rows = [
+        summarize_portfolio(df, "Long-Short Portfolio", "ret_ir_ls", "ret_ls", "trade_ls"),
+        summarize_portfolio(df, "Long-Only Portfolio", "ret_ir_long", "ret_long", "trade_long"),
+        summarize_portfolio(df, "Short-Only Portfolio", "ret_ir_short", "ret_short", "trade_short"),
     ]
 
-    rows = []
-    for name, trade_col, ir_col, dr_col in specs:
-        ir_stats = summarize(port.loc[port[trade_col], ir_col], sharpe=False)   # no Sharpe for IR
-        dr_stats = summarize(port.loc[port[trade_col], dr_col], sharpe=True)    # Sharpe only for drift
+    out = pd.DataFrame(rows)
 
-        rows.append({
-            "Portfolio": name,
-            "Initial Reaction Hit Rate (%)": ir_stats["hit"],
-            "Initial Reaction Mean Return (%)": ir_stats["mean"],
-            "Drift Hit Rate (%)": dr_stats["hit"],
-            "Drift Mean Return (%)": dr_stats["mean"],
-            "Drift Sharpe Ratio": dr_stats["sharpe"],
-            "Trading Days": dr_stats["n"],
-        })
-
-    table = pd.DataFrame(rows)  
-
-    # Summary rows similar to the paper (for overnight portion)
-    summary = pd.DataFrame(
+    summary_row = pd.DataFrame(
         [
-            {"Portfolio": "Firm-Day Observations", "Hit Rate (%)": firm_day_obs},
-            {"Portfolio": "Trading Days", "Hit Rate (%)": int(port["trade_ls"].sum())},
+            {
+                "Portfolio": "Sample Summary",
+                "Initial Reaction Hit Rate (%)": np.nan,
+                "Initial Reaction Mean Return (%)": np.nan,
+                "Drift Hit Rate (%)": np.nan,
+                "Drift Mean Return (%)": np.nan,
+                "Drift Sharpe Ratio": np.nan,
+                "Trading Days": int(df["date"].nunique()),
+                "Firm-Day Observations": int(df["n_total"].fillna(0).sum()),
+            }
         ]
     )
 
-    out = pd.concat([table, summary], ignore_index=True)
+    out = pd.concat([out, summary_row], ignore_index=True)
 
-    # nicer formatting (optional)
-    for c in ["Hit Rate (%)", "Mean Return (%)", "Sharpe Ratio"]:
-        if c in out.columns:
-            out[c] = out[c].astype(float)
+    value_cols = [
+        "Initial Reaction Hit Rate (%)",
+        "Initial Reaction Mean Return (%)",
+        "Drift Hit Rate (%)",
+        "Drift Mean Return (%)",
+        "Drift Sharpe Ratio",
+    ]
+    out[value_cols] = out[value_cols].round(3)
 
-    out.to_csv(OUT_CSV, index=False)
-    print(out)
-    print(f"\nWrote: {OUT_CSV}")
+    return out
+
+
+def filter_window(df: pd.DataFrame, start: pd.Timestamp | None, end: pd.Timestamp | None) -> pd.DataFrame:
+    out = df.copy()
+    if start is not None:
+        out = out[out["date"] >= start]
+    if end is not None:
+        out = out[out["date"] <= end]
+    return out
+
+
+def main():
+    df = pd.read_parquet(PORT_PATH).copy()
+    need = {
+        "date",
+        "n_total",
+        "ret_ir_ls", "ret_ls", "trade_ls",
+        "ret_ir_long", "ret_long", "trade_long",
+        "ret_ir_short", "ret_short", "trade_short",
+    }
+    if not need.issubset(df.columns):
+        raise KeyError(f"{PORT_PATH.name} must include {need}, got {set(df.columns)}")
+
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df = df.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
+
+    # Paper sample
+    df_paper = filter_window(df, PAPER_START, PAPER_END)
+    table_paper = build_table(df_paper)
+    table_paper.to_csv(OUT_PAPER, index=False)
+
+    # Full sample
+    table_full = build_table(df)
+    table_full.to_csv(OUT_FULL, index=False)
+
+    print(f"Wrote {OUT_PAPER} (rows={len(table_paper):,})")
+    print(f"Wrote {OUT_FULL} (rows={len(table_full):,})")
+    print("\nPaper sample date range:")
+    print(df_paper["date"].min(), "to", df_paper["date"].max())
+    print("\nFull sample date range:")
+    print(df["date"].min(), "to", df["date"].max())
 
 
 if __name__ == "__main__":
