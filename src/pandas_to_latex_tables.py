@@ -6,12 +6,11 @@ import pandas as pd
 
 from settings import config
 
-DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
-LABEL_CSV = DATA_DIR / "openai_output_label_proportions.csv"
-TABLE1_PAPER_CSV = DATA_DIR / "table1_overnight_paper_sample.csv"
-TABLE1_FULL_CSV = DATA_DIR / "table1_overnight_full_sample.csv"
+LABEL_CSV = OUTPUT_DIR / "openai_output_label_proportions.csv"
+TABLE1_PAPER_CSV = OUTPUT_DIR / "table1_overnight_paper_sample.csv"
+TABLE1_FULL_CSV = OUTPUT_DIR / "table1_overnight_full_sample.csv"
 
 LABEL_TEX = OUTPUT_DIR / "label_ratio_table.tex"
 TABLE1_PAPER_TEX = OUTPUT_DIR / "replication_table1_paper_sample.tex"
