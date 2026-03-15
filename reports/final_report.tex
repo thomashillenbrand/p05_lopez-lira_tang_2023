@@ -45,7 +45,7 @@
   \fi
 }
 
-\title{Replication of ``Can ChatGPT Forecast Stock Price Movements?''}
+\title{Replication of ``Can ChatGPT Forecast Stock Price Movements?'' \cite{LopezLiraTang2023}}
 \author{}
 \date{\today}
 
@@ -56,21 +56,20 @@
 
 \section{Introduction}
 
-Recent advances in large language models (LLMs) have generated significant interest in whether these models can extract economically meaningful information from textual data. The paper \emph{Can ChatGPT Forecast Stock Price Movements?} investigates whether a large language model can interpret financial news headlines and translate those interpretations into profitable trading signals.
+Recent advances in large language models (LLMs) have generated significant interest in whether these models can extract economically meaningful information from textual data. The paper \emph{Can ChatGPT Forecast Stock Price Movements?} \cite{LopezLiraTang2023} investigates whether a large language model can interpret financial news headlines and translate those interpretations into profitable trading signals.
 
-The central idea of the paper is straightforward. Each financial news headline is presented to ChatGPT, which is asked whether the headline implies that the associated firm's stock price will move up, down, or in no clear direction. These classifications are then used to construct trading portfolios that take long positions in firms with positive signals and short positions in firms with negative signals. The authors show that these signals have predictive power for stock returns and generate economically meaningful trading performance.
+The central idea in \cite{LopezLiraTang2023} is straightforward. Each financial news headline is presented to ChatGPT, which is asked whether the headline implies that the associated firm's stock price will move up, down, or in no clear direction. These classifications are then used to construct trading portfolios that take long positions in firms with positive signals and short positions in firms with negative signals. The authors show that these signals have predictive power for stock returns and generate economically meaningful trading performance.
 
 This project aims to replicate two of the paper's core empirical results: Table 1, which summarizes the predictive performance of the strategy, and Figure 5, which plots the cumulative returns of the strategy under several sample restrictions.
 
 
 \section{Data and Replication Pipeline}
 
-The replication pipeline follows the same general structure as the methodology described in the paper. The analysis combines financial news headlines with stock return data and uses a large language model to interpret the news content.
+The replication pipeline follows the same general structure as the methodology described in \cite{LopezLiraTang2023}. The analysis combines financial news headlines with stock return data and uses a large language model to interpret the news content.
 
 Stock return data are obtained from CRSP and cleaned to produce daily open and close prices as well as market capitalization measures. Financial news headlines are obtained from RavenPack and cleaned to produce a firm-level dataset of headline events. Filtering is done according to specifications in the paper, including only those articles with relevance scores of 100; only including headlines from news reports and press releases; and excluding those headlines that are directly categorized as `stock gain' or `stock loss'. Additionally, headlines are filtered to remove duplicate events based on the RavenPack provided event identifier, and are additionally filtered according to an OSA string dedupe to remove very similar headlines. Finally, because this replication only seeks to reproduce the overnight portion of the original paper's results, news classified as intraday (those released between 9am and 4pm ET, per the paper) are excluded from the analysis. Each headline is associated with a ticker and a date, where headlines released after 4pm are associated with the following day's date, and these events are then submitted to an OpenAI model for classification.
 
-The classification step follows the prompt described in the paper. Each headline is evaluated by the model and assigned one of three possible labels. A headline can imply that the firm's stock price is likely to increase (YES), decrease (NO), or that the headline contains no clear directional information (UNKNOWN). These outputs are aggregated at the firm-day level to produce a daily sentiment score for each firm.
-
+The classification step follows the prompt described in the paper \cite{LopezLiraTang2023}. Each headline is evaluated by the model -- in this replication, GPT3.5-Turbo is used because of its cut-off date of Sept. 2021 to avoid lookahead bias-- and assigned one of three possible labels. A headline can imply that the firm's stock price is likely to increase (YES), decrease (NO), or that the headline contains no clear directional information (UNKNOWN). These outputs are aggregated at the firm-day level to produce a daily sentiment score for each firm.
 Once firm-day signals are constructed, they are merged with CRSP returns. Portfolios are then formed each trading day by taking long positions in firms with positive signals and short positions in firms with negative signals. Returns are calculated for both the initial market reaction and the subsequent intraday drift.
 
 The entire process is implemented via a pipeline that cleans the data, processes model outputs, constructs firm-day signals, builds portfolios, and finally generates the final tables and figures used in the report.
@@ -112,7 +111,7 @@ Taken together, these summary statistics highlight the scale of the news dataset
 
 \section{Differences from the Original Study}
 
-While the replication pipeline closely follows the structure described in the paper, several important differences arise due to data availability and model constraints.
+While the replication pipeline closely follows the structure described in the paper \cite{LopezLiraTang2023}, several important differences arise due to data availability and model constraints.
 
 First, the original study combines RavenPack data with additional headlines collected through web scraping. In this replication we rely exclusively on RavenPack. As a result, the dataset contains approximately nine thousand fewer headlines over the sample period compared with the original study. This difference reduces the total number of potential signals available to construct trading portfolios.
 
@@ -136,7 +135,7 @@ A first diagnostic concerns how frequently the language model assigns each label
 
 The most striking feature of the results is the large share of UNKNOWN classifications. The majority of headlines are interpreted by the model as containing no clear directional implication for returns. Because the trading strategy only acts on positive and negative signals, this high share of neutral classifications reduces the number of tradable observations.
 
-This difference appears to be one of the main drivers of the discrepancies between our replication and the results reported in the paper. While the paper does not report the exact proportion of YES--NO--UNKNOWN responses it obtains, in Table OA4, when reporting the percentage of responses on a random sample of 1000 headlines, only ~34 percent are classified as unknown, a substantial reduction compared to the results obtained here.
+This difference appears to be one of the main drivers of the discrepancies between our replication and the results reported in the paper. While the paper does not report the exact proportion of YES--NO--UNKNOWN responses it obtains, in Table OA4, when reporting the percentage of responses on a random sample of 1000 headlines, only ~34 percent are classified as unknown, a substantial reduction compared to the results obtained here. This is likely due to the use of GPT3.5-Turbo as opposed to the paper, which uses GPT4 for its main analyses. 
 
 
 \section{Portfolio Composition}
@@ -145,7 +144,7 @@ To understand whether the smaller number of signals materially affects portfolio
 
 \begin{figure}[H]
 \centering
-\safefigureorplaceholder[width=.9\textwidth]{../_data/portfolio_size_diagnostics_all.png}
+\safefigureorplaceholder[width=.9\textwidth]{../_output/portfolio_size_diagnostics_all.png}
 \caption{Time variation in portfolio composition}
 \end{figure}
 
@@ -160,7 +159,7 @@ Table \ref{tab:paper_table1} reproduces Table 1 from the original paper.
 
 \begin{table}[H]
 \centering
-\caption{Table 1 from the original paper}
+\caption{Table 1 from the original paper \cite{LopezLiraTang2023}}
 \label{tab:paper_table1}
 
 \resizebox{\textwidth}{!}{
@@ -203,7 +202,7 @@ Table \ref{tab:rep_table1_paper} reports the corresponding results from our repl
 \safeinputorplaceholder{../_output/replication_table1_paper_sample.tex}
 \end{table}
 
-The replication broadly reproduces the qualitative pattern reported in the paper. The long-short portfolio generates positive drift returns and produces a Sharpe ratio that remains economically meaningful. However, the magnitude of the Sharpe ratio is lower than in the original study. This difference is consistent with the smaller portfolio sizes and the higher share of neutral classifications produced by the model.
+The replication broadly reproduces the qualitative pattern reported in the paper. The long-short portfolio generates positive drift returns and produces a Sharpe ratio that remains economically meaningful. However, the magnitude of the Sharpe ratio is lower than in the original study \cite{LopezLiraTang2023}. This difference is consistent with the smaller portfolio sizes and the higher share of neutral classifications produced by the model.
 
 In addition, we extend the date range used in the paper to include headlines and returns up to 3-1-2026.
 
@@ -225,12 +224,12 @@ Figure \ref{fig:rep_fig5} plots the cumulative return of the replication strateg
 
 \begin{figure}[H]
 \centering
-\safefigureorplaceholder[width=.9\textwidth]{../_data/figure5_paper_sample.png}
+\safefigureorplaceholder[width=.9\textwidth]{../_output/figure5_paper_sample.png}
 \caption{Replication of Figure 5}
 \label{fig:rep_fig5}
 \end{figure}
 
-The cumulative return profile of the strategy remains strongly positive over the sample period. Although the growth rate is somewhat lower than that reported in the original paper, the general pattern of sustained positive returns is preserved.
+The cumulative return profile of the strategy remains positive over the sample period. Although the growth rate is lower than that reported in the original paper \cite{LopezLiraTang2023}, the general pattern of sustained positive returns is preserved.
 
 Less stable is the pattern displayed by the Not-small and $\mathord{>}5$ portfolios; whereas the original figure shows a strong pattern of returns higher than market, but lower than the long-short, our trends fluctuate more. Likely, this is due to the decreased number of stocks present in our portfolios from the higher rate of 'unknown' assignment to headlines through the OpenAI processing steps.
 
@@ -238,20 +237,25 @@ We repeat Figure 5 but extend the date window from the paper's original sample o
 
 \begin{figure}[H]
 \centering
-\safefigureorplaceholder[width=.9\textwidth]{../_data/figure5_full_sample.png}
+\safefigureorplaceholder[width=.9\textwidth]{../_output/figure5_full_sample.png}
 \caption{Replication of Figure 5}
 \label{fig:rep_fig5_full}
 \end{figure}
 
-Returns seem less stable in 2026 than in previous years.
+Returns appear less stable in 2026 than in previous years.
 
 
 \section{Conclusion}
 
-The replication successfully reproduces the central empirical finding of the original paper: language-model interpretations of financial news headlines contain predictive information about stock returns. The long-short strategy based on these signals continues to generate positive drift returns and economically meaningful Sharpe ratios.
+The replication successfully reproduces the central empirical finding of the original paper \cite{LopezLiraTang2023}: language-model interpretations of financial news headlines contain predictive information about stock returns. The long-short strategy based on these signals continues to generate positive drift returns and economically meaningful Sharpe ratios.
 
-At the same time, the replication reveals several differences in magnitude relative to the original results. Portfolio sizes are smaller, cumulative returns grow more slowly, and the model assigns a much larger fraction of headlines to the UNKNOWN category. These differences appear to arise primarily from the use of a different language model and from the reduced headline coverage resulting from the absence of web-scraped data.
+At the same time, the replication reveals several differences in magnitude relative to the original results. Portfolio sizes are smaller, cumulative returns grow more slowly, and the model assigns a much larger fraction of headlines to the UNKNOWN category. These differences appear to arise primarily from the use of a different language model (GPT3.5-Turbo vs GPT4) and/or from the reduced headline coverage resulting from the absence of web-scraped data.
 
 Despite these differences, the replication confirms that large language models can extract useful financial signals from news headlines and translate them into profitable trading strategies.
+
+\section{Bibliography}
+
+\bibliographystyle{jpe}
+\bibliography{bibliography}
 
 \end{document}
