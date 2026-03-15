@@ -180,7 +180,7 @@ defaults = {
     "DATA_DIR": if_relative_make_abs(Path("_data")),
     "MANUAL_DATA_DIR": if_relative_make_abs(Path("data_manual")),
     "OUTPUT_DIR": if_relative_make_abs(Path("_output")),
-    **defaults,
+    **defaults
 }
 
 
