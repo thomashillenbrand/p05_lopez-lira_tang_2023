@@ -79,13 +79,40 @@ def pull_ravenpack(wrds_username: str = WRDS_USERNAME) -> pd.DataFrame:
     # - We ADD entity_name from the mappings table to support your OpenAI prompting step.
     # - UNION ALL branches are kept identical across years for stability.
     query = f"""
-    WITH id AS (
+    WITH id_raw AS (
       SELECT
         rp_entity_id,
-        ticker,
+        NULLIF(UPPER(TRIM(ticker)), '') AS ticker,
         {entity_name_select}
       FROM {mapping_schema}.{mapping_table}
       WHERE entity_type = 'COMP'
+    ),
+    id_ranked AS (
+      SELECT
+        rp_entity_id,
+        ticker,
+        entity_name,
+        ROW_NUMBER() OVER (
+          PARTITION BY rp_entity_id
+          ORDER BY
+            CASE
+              WHEN ticker IS NULL THEN 2
+              WHEN POSITION('.' IN ticker) > 0 OR POSITION('/' IN ticker) > 0 THEN 1
+              ELSE 0
+            END,
+            LENGTH(COALESCE(ticker, '')),
+            COALESCE(ticker, ''),
+            COALESCE(entity_name, '')
+        ) AS rn
+      FROM id_raw
+    ),
+    id AS (
+      SELECT
+        rp_entity_id,
+        ticker,
+        entity_name
+      FROM id_ranked
+      WHERE rn = 1
     ),
     rp AS (
       SELECT
@@ -176,7 +203,10 @@ def pull_ravenpack(wrds_username: str = WRDS_USERNAME) -> pd.DataFrame:
         rp.headline,
         ROW_NUMBER() OVER (
           PARTITION BY rp.rp_entity_id, rp.event_similarity_key
-          ORDER BY rp.timestamp_utc
+          ORDER BY
+            rp.timestamp_utc,
+            COALESCE(id.ticker, ''),
+            COALESCE(rp.headline, '')
         ) AS rn
       FROM rp
       LEFT JOIN id ON rp.rp_entity_id = id.rp_entity_id
