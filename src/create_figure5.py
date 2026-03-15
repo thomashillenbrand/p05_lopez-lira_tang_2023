@@ -9,14 +9,15 @@ import pandas as pd
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
+OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
 PORT_PATH = DATA_DIR / "portfolio_daily_returns.parquet"
 
-OUT_PAPER_PNG = DATA_DIR / "figure5_paper_sample.png"
-OUT_FULL_PNG = DATA_DIR / "figure5_full_sample.png"
+OUT_PAPER_PNG = OUTPUT_DIR / "figure5_paper_sample.png"
+OUT_FULL_PNG = OUTPUT_DIR / "figure5_full_sample.png"
 
-OUT_PAPER_CSV = DATA_DIR / "figure5_paper_sample_series.csv"
-OUT_FULL_CSV = DATA_DIR / "figure5_full_sample_series.csv"
+OUT_PAPER_CSV = OUTPUT_DIR / "figure5_paper_sample_series.csv"
+OUT_FULL_CSV = OUTPUT_DIR / "figure5_full_sample_series.csv"
 
 # Match the paper window
 PAPER_START = pd.Timestamp("2021-10-01")

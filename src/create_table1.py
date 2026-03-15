@@ -7,11 +7,11 @@ import pandas as pd
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
+OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 
 PORT_PATH = DATA_DIR / "portfolio_daily_returns.parquet"
-OUT_PAPER = DATA_DIR / "table1_overnight_paper_sample.csv"
-OUT_FULL = DATA_DIR / "table1_overnight_full_sample.csv"
-
+OUT_PAPER = OUTPUT_DIR / "table1_overnight_paper_sample.csv"
+OUT_FULL = OUTPUT_DIR / "table1_overnight_full_sample.csv"
 PAPER_START = pd.Timestamp("2021-10-01")
 PAPER_END = pd.Timestamp("2024-05-31")
 
