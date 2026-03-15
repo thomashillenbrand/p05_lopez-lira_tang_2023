@@ -118,7 +118,7 @@ def make_requests_jsonl(
             f.write(json.dumps(request_obj) + "\n")
 
     print(f"Wrote requests jsonl: {requests_output_dir}")
-    print(f"Number of headlines queued: {len(id_to_row):,}")
+    print(f"Number of headlines batched: {len(id_to_row):,}")
     with id_row_json_output_dir.open("w", encoding="utf-8") as f:
         json.dump(id_to_row, f, indent=2)
     print(f"Wrote id to row mapping json: {id_row_json_output_dir}")
