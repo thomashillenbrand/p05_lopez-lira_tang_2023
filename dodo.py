@@ -209,7 +209,9 @@ def task_process():
             DATA_DIR / "openai_headline_requests.4.jsonl",
             DATA_DIR / "id_to_row_mapping.4.json",
             DATA_DIR / "openai_headline_requests.5.jsonl",
-            DATA_DIR / "id_to_row_mapping.5.json"
+            DATA_DIR / "id_to_row_mapping.5.json",
+            DATA_DIR / "openai_headline_requests.6.jsonl",
+            DATA_DIR / "id_to_row_mapping.6.json"
         ],
         "file_dep": [
             "./src/settings.py",
@@ -231,15 +233,17 @@ def task_process():
         ],
         "targets": [
             DATA_DIR / "openai_headline_batch_output.1.jsonl",
-            DATA_DIR / "openai_headline_batch_metadata.1.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.1.json",
             DATA_DIR / "openai_headline_batch_output.2.jsonl",
-            DATA_DIR / "openai_headline_batch_metadata.2.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.2.json",
             DATA_DIR / "openai_headline_batch_output.3.jsonl",
-            DATA_DIR / "openai_headline_batch_metadata.3.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.3.json",
             DATA_DIR / "openai_headline_batch_output.4.jsonl",
-            DATA_DIR / "openai_headline_batch_metadata.4.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.4.json",
             DATA_DIR / "openai_headline_batch_output.5.jsonl",
-            DATA_DIR / "openai_headline_batch_metadata.5.jsonl"
+            DATA_DIR / "openai_headline_batch_metadata.5.json",
+            DATA_DIR / "openai_headline_batch_output.6.jsonl",
+            DATA_DIR / "openai_headline_batch_metadata.6.json"
         ],
         "file_dep": [
             "./src/settings.py",
@@ -254,6 +258,8 @@ def task_process():
             DATA_DIR / "id_to_row_mapping.4.json",
             DATA_DIR / "openai_headline_requests.5.jsonl",
             DATA_DIR / "id_to_row_mapping.5.json",
+            DATA_DIR / "openai_headline_requests.6.jsonl",
+            DATA_DIR / "id_to_row_mapping.6.json",
 
         ],
         "task_dep": [
@@ -275,16 +281,40 @@ def task_process():
         "file_dep": [
             "./src/settings.py",
             "./src/create_firmday_score.py",
-            OUTPUT_DIR / "openai_headline_batch_output.1.jsonl",
-            OUTPUT_DIR / "openai_headline_batch_output.2.jsonl",
-            OUTPUT_DIR / "openai_headline_batch_output.3.jsonl",
-            OUTPUT_DIR / "openai_headline_batch_output.4.jsonl",
-            OUTPUT_DIR / "openai_headline_batch_output.5.jsonl",
+            DATA_DIR / "openai_headline_batch_output.1.jsonl",
+            DATA_DIR / "openai_headline_batch_output.2.jsonl",
+            DATA_DIR / "openai_headline_batch_output.3.jsonl",
+            DATA_DIR / "openai_headline_batch_output.4.jsonl",
+            DATA_DIR / "openai_headline_batch_output.5.jsonl",
+            DATA_DIR / "openai_headline_batch_output.6.jsonl"
         ],
         "task_dep": [
             "process:submit_headlines_to_openai",
         ],
         "clean": []
+    } 
+
+    yield {
+        "name": "create_portfolios",
+        "doc": "Construct portfolio return series used by downstream figures and tables",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_portfolios.py",
+        ],
+        "targets": [
+            DATA_DIR / "portfolio_daily_returns.parquet",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_portfolios.py",
+            DATA_DIR / "daily_headline_polarity.parquet",
+            DATA_DIR / "CRSP_stock_daily.parquet",
+        ],
+        "task_dep": [
+            "process:create_firm_day_score",
+            "pull:crsp_stock",
+        ],
+        "clean": [],
     }
 
 notebook_tasks = {
@@ -326,8 +356,8 @@ def task_run_notebooks():
 # fmt: on
 
 
-# def task_charts():
-#     """HW3: Generate exploratory charts (interactive HTML)"""
+def task_charts():
+    """HW3: Generate exploratory charts (interactive HTML)"""
 #     yield {
 #         "name": "crsp_daily_closing_prices",
 #         "actions": [
@@ -343,21 +373,228 @@ def task_run_notebooks():
 #         "clean": True,
 #     }
 
-#     yield {
-#         "name": "ravenpack_news_timing",
-#         "actions": [
-#             "ipython ./src/settings.py",
-#             "ipython ./src/plot_ravenpack_data.py",
-#         ],
-#         "targets": [OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"],
-#         "file_dep": [
-#             "./src/settings.py",
-#             "./src/plot_ravenpack_data.py",
-#             DATA_DIR / "RAVENPACK.parquet",
-#         ],
-#         "clean": True,
-#     }
+    yield {
+        "name": "ravenpack_news_timing",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/plot_ravenpack_data.py",
+        ],
+        "targets": [OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/plot_ravenpack_data.py",
+            DATA_DIR / "RAVENPACK.parquet",
+        ],
+        "clean": True,
+    }
 
+    """Generate report-facing CSVs, figures, and LaTeX table fragments"""
+
+    yield {
+        "name": "summary_statistics",
+        "doc": "Create summary statistics CSVs for CRSP universe and news distribution",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_summary_statistics.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "summary_stats_crsp_universe.csv",
+            OUTPUT_DIR / "summary_stats_news_by_year.csv",
+            OUTPUT_DIR / "summary_stats_news_by_timing.csv",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_summary_statistics.py",
+            DATA_DIR / "CRSP_stock_daily.parquet",
+            DATA_DIR / "RAVENPACK.parquet",
+        ],
+        "task_dep": [
+            "pull:crsp_stock",
+            "pull:ravenpack",
+        ],
+        "clean": [],
+    }
+
+    yield {
+        "name": "openai_responses_proportion",
+        "doc": "Create label proportion CSV from OpenAI batch outputs",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_openai_responses_table.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "openai_output_label_proportions.csv",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_openai_responses_table.py",
+            DATA_DIR / "id_to_row_mapping.1.json",
+            DATA_DIR / "id_to_row_mapping.2.json",
+            DATA_DIR / "id_to_row_mapping.3.json",
+            DATA_DIR / "id_to_row_mapping.4.json",
+            DATA_DIR / "id_to_row_mapping.5.json",
+            DATA_DIR / "openai_headline_batch_output.1.jsonl",
+            DATA_DIR / "openai_headline_batch_output.2.jsonl",
+            DATA_DIR / "openai_headline_batch_output.3.jsonl",
+            DATA_DIR / "openai_headline_batch_output.4.jsonl",
+            DATA_DIR / "openai_headline_batch_output.5.jsonl",
+        ],
+        "clean": [],
+    }
+
+    yield {
+        "name": "portfolio_size",
+        "doc": "Create portfolio size diagnostic plots and CSVs",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_portfolio_size.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "portfolio_size_diagnostics_daily.csv",
+            OUTPUT_DIR / "portfolio_size_diagnostics_summary.csv",
+            OUTPUT_DIR / "portfolio_size_diagnostics_all.png",
+            OUTPUT_DIR / "portfolio_size_diagnostics_grid.png",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_portfolio_size.py",
+            DATA_DIR / "daily_headline_polarity.parquet",
+            DATA_DIR / "CRSP_stock_daily.parquet",
+        ],
+        "task_dep": [
+            "process:create_firm_day_score",
+            "pull:crsp_stock",
+        ],
+        "clean": [],
+    }
+
+    yield {
+        "name": "table1",
+        "doc": "Create Table 1 CSVs for paper and full samples",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_table1.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "table1_overnight_paper_sample.csv",
+            OUTPUT_DIR / "table1_overnight_full_sample.csv",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_table1.py",
+            DATA_DIR / "daily_headline_polarity.parquet",
+            DATA_DIR / "CRSP_stock_daily.parquet",
+        ],
+        "task_dep": [
+            "process:create_firm_day_score",
+            "pull:crsp_stock",
+        ],
+        "clean": [],
+    }
+
+    yield {
+        "name": "figure5",
+        "doc": "Create Figure 5 charts and exported series CSVs",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/create_figure5.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "figure5_paper_sample.png",
+            OUTPUT_DIR / "figure5_full_sample.png",
+            OUTPUT_DIR / "figure5_paper_sample_series.csv",
+            OUTPUT_DIR / "figure5_full_sample_series.csv",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/create_figure5.py",
+            DATA_DIR / "portfolio_daily_returns.parquet",
+        ],
+        "task_dep": [
+            "process:create_portfolios",
+        ],
+        "clean": [],
+    }
+
+    yield {
+        "name": "pandas_to_latex",
+        "doc": "Convert report CSV outputs into LaTeX table fragments",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/pandas_to_latex_tables.py",
+        ],
+        "targets": [
+            OUTPUT_DIR / "label_ratio_table.tex",
+            OUTPUT_DIR / "replication_table1_paper_sample.tex",
+            OUTPUT_DIR / "replication_table1_full_sample.tex",
+            OUTPUT_DIR / "summary_stats_crsp_universe.tex",
+            OUTPUT_DIR / "summary_stats_news_by_year.tex",
+            OUTPUT_DIR / "summary_stats_news_by_timing.tex",
+        ],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/pandas_to_latex_tables.py",
+            OUTPUT_DIR / "openai_output_label_proportions.csv",
+            OUTPUT_DIR / "table1_overnight_paper_sample.csv",
+            OUTPUT_DIR / "table1_overnight_full_sample.csv",
+            OUTPUT_DIR / "summary_stats_crsp_universe.csv",
+            OUTPUT_DIR / "summary_stats_news_by_year.csv",
+            OUTPUT_DIR / "summary_stats_news_by_timing.csv",
+        ],
+        "task_dep": [
+            "charts:summary_statistics",
+            "charts:openai_responses_proportion",
+            "charts:table1",
+        ],
+        "clean": [],
+    }
+
+
+
+###############################################################
+## Task below is for LaTeX compilation
+###############################################################
+
+def task_compile_latex_docs():
+    """Compile the LaTeX documents to PDFs"""
+
+    file_dep = [
+        "./reports/final_report.tex",
+        "./reports/bibliography.bib",
+        "./reports/jpe.bst",
+        "./reports/my_article_header.sty",
+        "./reports/my_common_header.sty",
+
+        OUTPUT_DIR / "label_ratio_table.tex",
+        OUTPUT_DIR / "replication_table1_paper_sample.tex",
+        OUTPUT_DIR / "replication_table1_full_sample.tex",
+        OUTPUT_DIR / "summary_stats_crsp_universe.tex",
+        OUTPUT_DIR / "summary_stats_news_by_year.tex",
+        OUTPUT_DIR / "summary_stats_news_by_timing.tex",
+
+        OUTPUT_DIR / "figure5_paper_sample.png",
+        OUTPUT_DIR / "figure5_full_sample.png",
+        OUTPUT_DIR / "portfolio_size_diagnostics_all.png",
+        OUTPUT_DIR / "portfolio_size_diagnostics_grid.png",
+    ]
+
+    targets = [
+        "./reports/final_report.pdf",
+    ]
+
+    return {
+        "actions": [
+            "latexmk -xelatex -halt-on-error -cd ./reports/final_report.tex",
+        ],
+        "targets": targets,
+        "file_dep": file_dep,
+        "task_dep": [
+            "charts:pandas_to_latex",
+            "charts:portfolio_size",
+            "charts:figure5",
+        ],
+        "clean": True,
+    }
 
 # sphinx_targets = [
 #     "./docs/index.html",

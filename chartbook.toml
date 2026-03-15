@@ -43,7 +43,50 @@ how_is_pulled = "src/pull_CRSP_stock.py"
 path_to_parquet_data = "_data/CRSP_stock_daily.parquet"
 date_col = "dlycaldt"
 
+[dataframes.daily_headline_polarity]
+dataframe_id = "daily_headline_polarity"
+dataframe_docs_str = "Firm-day sentiment scores derived from OpenAI classifications of RavenPack headlines."
+data_sources = ["RavenPack", "OpenAI"]
+data_providers = ["RavenPack", "OpenAI"]
+how_is_pulled = "src/create_firmday_score.py"
+path_to_parquet_data = "_data/daily_headline_polarity.parquet"
+date_col = "date"
 
+[dataframes.portfolio_returns]
+dataframe_id = "portfolio_returns"
+dataframe_docs_str = "Daily returns of headline-based trading portfolios constructed from RavenPack sentiment signals."
+data_sources = ["CRSP", "RavenPack", "OpenAI"]
+data_providers = ["WRDS", "OpenAI"]
+how_is_pulled = "src/create_portfolios.py"
+path_to_parquet_data = "_data/portfolio_daily_returns.parquet"
+date_col = "date"
+
+[dataframes.table1_paper_sample]
+dataframe_id = "table1_paper_sample"
+dataframe_docs_str = "Replication of Table 1 using the paper sample period from 2021-10-01 to 2024-05-31."
+data_sources = ["CRSP", "RavenPack", "OpenAI"]
+data_providers = ["WRDS", "OpenAI"]
+how_is_pulled = "src/create_table1.py"
+path_to_parquet_data = "_output/table1_overnight_paper_sample.csv"
+date_col = "date"
+
+[dataframes.table1_full_sample]
+dataframe_id = "table1_full_sample"
+dataframe_docs_str = "Replication of Table 1 using the full available sample."
+data_sources = ["CRSP", "RavenPack", "OpenAI"]
+data_providers = ["WRDS", "OpenAI"]
+how_is_pulled = "src/create_table1.py"
+path_to_parquet_data = "_output/table1_overnight_full_sample.csv"
+date_col = "date"
+
+[dataframes.openai_label_proportions]
+dataframe_id = "openai_label_proportions"
+dataframe_docs_str = "Distribution of OpenAI headline labels across the paper sample and the full sample."
+data_sources = ["RavenPack", "OpenAI"]
+data_providers = ["RavenPack", "OpenAI"]
+how_is_pulled = "src/create_openai_responses_table.py"
+path_to_parquet_data = "_output/openai_output_label_proportions.csv"
+date_col = "date"
 
 [charts]
 
@@ -54,9 +97,23 @@ chart_docs_str = "Overnight vs Intraday RavenPack News"
 short_description_chart = "Daily proportion of RavenPack headlines posted outside vs inside market hours (ET), with average lines."
 path_to_html_chart = "_output/ravenpack_overnight_intraday_proportion.html"
 
-[charts.crsp_daily_stock]
-dataframe_id = "crsp_daily_stock"
-chart_docs_str = "A timeseries of adjusted daily closing price for 3 major stocks"
-chart_name = "Daily Closing Prices"
-short_description_chart = "A timeseries of adjusted daily closing price for 3 major stocks"
-path_to_html_chart = "_output/crsp_daily_closing_prices.html"
+[charts.figure5_paper_sample]
+dataframe_id = "portfolio_returns"
+chart_name = "Figure 5: Portfolio Performance (Paper Sample)"
+chart_docs_str = "Replication of Figure 5 over the paper sample period."
+short_description_chart = "Cumulative portfolio value for the long-short strategy and benchmark variants over the paper sample."
+path_to_html_chart = "_output/figure5_paper_sample.png"
+
+[charts.figure5_full_sample]
+dataframe_id = "portfolio_returns"
+chart_name = "Figure 5: Portfolio Performance (Full Sample)"
+chart_docs_str = "Replication of Figure 5 over the full available sample."
+short_description_chart = "Cumulative portfolio value for the long-short strategy and benchmark variants over the full sample."
+path_to_html_chart = "_output/figure5_full_sample.png"
+
+[charts.portfolio_size_diagnostics]
+dataframe_id = "portfolio_returns"
+chart_name = "Portfolio Size Diagnostics"
+chart_docs_str = "Daily long and short portfolio counts for the main strategy and restricted variants."
+short_description_chart = "Number of stocks in the long and short portfolios through time."
+path_to_html_chart = "_output/portfolio_size_diagnostics_all.png"
