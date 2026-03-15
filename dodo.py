@@ -85,7 +85,6 @@ def jupyter_clear_output(notebook_path):
     return f"jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace {notebook_path}"
 # fmt: on
 
-
 def mv(from_path, to_path):
     """Move a file to a folder"""
     from_path = Path(from_path)
@@ -287,6 +286,44 @@ def task_process():
         ],
         "clean": []
     }
+
+notebook_tasks = {
+    "p05_chatgpt_price_forecasting_guide": {
+        "path": "./src/p05_chatgpt_price_forecasting_guide_ipynb.py",
+        "file_dep": [],
+        "targets": [],
+    },
+}
+    
+# fmt: off
+def task_run_notebooks():
+    """Preps the notebooks for presentation format.
+    Execute notebooks if the script version of it has been changed.
+    """
+    for notebook in notebook_tasks.keys():
+        pyfile_path = Path(notebook_tasks[notebook]["path"])
+        notebook_path = pyfile_path.with_suffix(".ipynb")
+        yield {
+            "name": notebook,
+            "actions": [
+                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+                f"jupytext --to notebook --output {notebook_path} {pyfile_path}",
+                jupyter_execute_notebook(notebook_path),
+                jupyter_to_html(notebook_path),
+                mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
+                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+            ],
+            "file_dep": [
+                pyfile_path,
+                *notebook_tasks[notebook]["file_dep"],
+            ],
+            "targets": [
+                OUTPUT_DIR / f"{notebook}.html",
+                *notebook_tasks[notebook]["targets"],
+            ],
+            "clean": True,
+        }
+# fmt: on
 
 
 # def task_charts():
