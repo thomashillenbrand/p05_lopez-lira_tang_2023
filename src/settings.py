@@ -247,6 +247,7 @@ def config(
 
 def create_directories():
     config("DATA_DIR").mkdir(parents=True, exist_ok=True)
+    config("MANUAL_DATA_DIR").mkdir(parents=True, exist_ok=True)
     config("OUTPUT_DIR").mkdir(parents=True, exist_ok=True)
 
 
