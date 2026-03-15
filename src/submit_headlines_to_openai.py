@@ -7,7 +7,6 @@ from openai import OpenAI
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
-OUTPUT_DIR = Path(config("OUTPUT_DIR"))
 OPENAI_API_KEY = config("OPENAI_API_KEY")
 
 REQUESTS_GLOB = "openai_headline_requests.*.jsonl"
@@ -128,9 +127,9 @@ def download_file_content(client: OpenAI, file_id: str, out_path: Path) -> None:
 def main():
     """Main method to drive the process of creating, submitting, and downloading the OpenAI batch job and its results."""
     
-    result_paths = list(OUTPUT_DIR.glob("openai_headline_batch_output.*.jsonl"))
+    result_paths = list(DATA_DIR.glob("openai_headline_batch_output.*.jsonl"))
     if result_paths:
-        print(f"Batch output files already exist in {OUTPUT_DIR}: {[p.name for p in result_paths]}")
+        print(f"Batch output files already exist in {DATA_DIR}: {[p.name for p in result_paths]}")
         print("Skipping batch job submission to avoid duplicates. If you want to resubmit, please remove existing batch output files first.")
         return
     
@@ -152,7 +151,7 @@ def main():
     failed_indices: list[int] = []
     for idx, _ in request_files:
         batch_data = all_batch_data[idx]
-        metadata_path = OUTPUT_DIR / f"openai_headline_batch_metadata.{idx}.json"
+        metadata_path = DATA_DIR / f"openai_headline_batch_metadata.{idx}.json"
         metadata_path.write_text(
             json.dumps(batch_data.model_dump(), indent=2, default=str),
             encoding="utf-8",
@@ -168,13 +167,13 @@ def main():
         error_file_id = batch_data.error_file_id
 
         if output_file_id:
-            output_path = OUTPUT_DIR / f"openai_headline_batch_output.{idx}.jsonl"
+            output_path = DATA_DIR / f"openai_headline_batch_output.{idx}.jsonl"
             download_file_content(openai_client, output_file_id, output_path)
         else:
             print(f"Batch {idx} completed but output_file_id is missing.")
 
         if error_file_id:
-            error_path = OUTPUT_DIR / f"openai_headline_batch_errors.{idx}.jsonl"
+            error_path = DATA_DIR / f"openai_headline_batch_errors.{idx}.jsonl"
             download_file_content(openai_client, error_file_id, error_path)
 
     if failed_indices:
