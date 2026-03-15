@@ -320,7 +320,7 @@ def task_process():
 
 
 def task_charts():
-#     """HW3: Generate exploratory charts (interactive HTML)"""
+    """HW3: Generate exploratory charts (interactive HTML)"""
 #     yield {
 #         "name": "crsp_daily_closing_prices",
 #         "actions": [
@@ -336,20 +336,20 @@ def task_charts():
 #         "clean": True,
 #     }
 
-#     yield {
-#         "name": "ravenpack_news_timing",
-#         "actions": [
-#             "ipython ./src/settings.py",
-#             "ipython ./src/plot_ravenpack_data.py",
-#         ],
-#         "targets": [OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"],
-#         "file_dep": [
-#             "./src/settings.py",
-#             "./src/plot_ravenpack_data.py",
-#             DATA_DIR / "RAVENPACK.parquet",
-#         ],
-#         "clean": True,
-#     }
+    yield {
+        "name": "ravenpack_news_timing",
+        "actions": [
+            "ipython ./src/settings.py",
+            "ipython ./src/plot_ravenpack_data.py",
+        ],
+        "targets": [OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"],
+        "file_dep": [
+            "./src/settings.py",
+            "./src/plot_ravenpack_data.py",
+            DATA_DIR / "RAVENPACK.parquet",
+        ],
+        "clean": True,
+    }
 
     """Generate report-facing CSVs, figures, and LaTeX table fragments"""
 
