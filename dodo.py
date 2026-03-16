@@ -318,7 +318,7 @@ def task_process():
     }
 
 notebook_tasks = {
-    "p05_chatgpt_price_forecasting_guide": {
+    "p05_chatgpt_price_forecasting_guide_ipynb": {
         "path": "./src/p05_chatgpt_price_forecasting_guide_ipynb.py",
         "file_dep": [],
         "targets": [],
@@ -605,6 +605,6 @@ def task_build_chartbook_site():
         ],  # Use docs as build destination
         "targets": sphinx_targets,
         "file_dep": file_dep,
-        "task_dep": ["charts"],
+        "task_dep": ["run_notebooks", "charts"],
         "clean": True,
     }
