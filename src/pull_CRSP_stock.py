@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import wrds
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -88,9 +89,8 @@ if __name__ == "__main__":
     crsp_path = Path(DATA_DIR) / "CRSP_stock_daily.parquet"
     crsp_df.to_parquet(crsp_path, index=False)
     print(f"Saved CRSP daily data to: {crsp_path}")
-     
+
     unique_tickers_path = Path(DATA_DIR) / "CRSP_unique_tickers.parquet"
-    tickers_df = pd.DataFrame({'ticker': crsp_df['ticker'].unique()})
+    tickers_df = pd.DataFrame({"ticker": crsp_df["ticker"].unique()})
     tickers_df.to_parquet(unique_tickers_path, index=False)
     print(f"Saved unique tickers to: {unique_tickers_path}")
-    

@@ -123,7 +123,9 @@ def test_filter_window_applies_inclusive_date_bounds():
 def test_main_reads_builds_and_writes_paper_and_full_tables(monkeypatch, tmp_path):
     input_df = pd.DataFrame(
         {
-            "date": pd.to_datetime(["2021-09-30", "2021-10-01", "2024-05-31", "2024-06-01"]),
+            "date": pd.to_datetime(
+                ["2021-09-30", "2021-10-01", "2024-05-31", "2024-06-01"]
+            ),
             "n_total": [1, 2, 3, 4],
             "ret_ir_ls": [0.01, 0.02, -0.01, 0.00],
             "ret_ls": [0.001, 0.002, -0.001, 0.000],

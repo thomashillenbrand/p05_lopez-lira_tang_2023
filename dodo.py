@@ -16,6 +16,7 @@ from os import environ, getcwd, path
 from pathlib import Path
 
 from colorama import Fore, Style, init
+
 ## Custom reporter: Print PyDoit Text in Green
 # This is helpful because some tasks write to sterr and pollute the output in
 # the console. I don't want to mute this output, because this can sometimes
@@ -24,6 +25,7 @@ from colorama import Fore, Style, init
 # to easily see the task lines printed by PyDoit. I want them to stand out
 # from among all the other lines printed to the console.
 from doit.reporter import ConsoleReporter
+
 from settings import config
 
 try:
@@ -71,6 +73,7 @@ END_DATE = config("END_DATE")
 ## Helpers for handling Jupyter Notebook tasks
 environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
 
+
 # fmt: off
 ## Helper functions for automatic execution of Jupyter notebooks
 def jupyter_execute_notebook(notebook_path):
@@ -84,6 +87,7 @@ def jupyter_clear_output(notebook_path):
     """Clear the output of a notebook"""
     return f"jupyter nbconvert --ClearOutputPreprocessor.enabled=True --ClearMetadataPreprocessor.enabled=True --inplace {notebook_path}"
 # fmt: on
+
 
 def mv(from_path, to_path):
     """Move a file to a folder"""
@@ -136,12 +140,9 @@ def task_pull():
         ],
         "targets": [
             DATA_DIR / "CRSP_stock_daily.parquet",
-            DATA_DIR / "CRSP_unique_tickers.parquet"
+            DATA_DIR / "CRSP_unique_tickers.parquet",
         ],
-        "file_dep": [
-            "./src/settings.py",
-            "./src/pull_CRSP_stock.py"
-        ],
+        "file_dep": ["./src/settings.py", "./src/pull_CRSP_stock.py"],
         "clean": [],
     }
     yield {
@@ -151,15 +152,11 @@ def task_pull():
             "ipython ./src/settings.py",
             "ipython ./src/pull_ravenpack.py",
         ],
-        "targets": [
-            DATA_DIR / "RAVENPACK.parquet"
-        ],
-        "file_dep": [
-            "./src/settings.py",
-            "./src/pull_ravenpack.py"
-        ],
+        "targets": [DATA_DIR / "RAVENPACK.parquet"],
+        "file_dep": ["./src/settings.py", "./src/pull_ravenpack.py"],
         "clean": [],
     }
+
 
 def task_clean_data():
     """
@@ -181,17 +178,14 @@ def task_clean_data():
             DATA_DIR / "RAVENPACK.parquet",
             DATA_DIR / "CRSP_unique_tickers.parquet",
         ],
-        "task_dep": [
-            "pull:ravenpack",
-            "pull:crsp_stock"
-        ],
+        "task_dep": ["pull:ravenpack", "pull:crsp_stock"],
         "clean": [],
     }
 
 
 def task_process():
     """Data processing steps"""
-    
+
     yield {
         "name": "generate_batched_requests",
         "doc": "Generate JSONL file(s) of batched requests for OpenAI batch",
@@ -211,7 +205,7 @@ def task_process():
             DATA_DIR / "openai_headline_requests.5.jsonl",
             DATA_DIR / "id_to_row_mapping.5.json",
             DATA_DIR / "openai_headline_requests.6.jsonl",
-            DATA_DIR / "id_to_row_mapping.6.json"
+            DATA_DIR / "id_to_row_mapping.6.json",
         ],
         "file_dep": [
             "./src/settings.py",
@@ -243,7 +237,7 @@ def task_process():
             DATA_DIR / "openai_headline_batch_output.5.jsonl",
             DATA_DIR / "openai_headline_batch_metadata.5.json",
             DATA_DIR / "openai_headline_batch_output.6.jsonl",
-            DATA_DIR / "openai_headline_batch_metadata.6.json"
+            DATA_DIR / "openai_headline_batch_metadata.6.json",
         ],
         "file_dep": [
             "./src/settings.py",
@@ -260,14 +254,13 @@ def task_process():
             DATA_DIR / "id_to_row_mapping.5.json",
             DATA_DIR / "openai_headline_requests.6.jsonl",
             DATA_DIR / "id_to_row_mapping.6.json",
-
         ],
         "task_dep": [
             "process:generate_batched_requests",
         ],
         "clean": [],
     }
-    
+
     yield {
         "name": "create_firm_day_score",
         "doc": "Process OpenAI batch output and aggregate to daily ticker-level sentiment",
@@ -275,9 +268,7 @@ def task_process():
             "ipython ./src/settings.py",
             "ipython ./src/create_firmday_score.py",
         ],
-        "targets": [
-            DATA_DIR / "daily_headline_polarity.parquet"
-        ],
+        "targets": [DATA_DIR / "daily_headline_polarity.parquet"],
         "file_dep": [
             "./src/settings.py",
             "./src/create_firmday_score.py",
@@ -286,13 +277,13 @@ def task_process():
             DATA_DIR / "openai_headline_batch_output.3.jsonl",
             DATA_DIR / "openai_headline_batch_output.4.jsonl",
             DATA_DIR / "openai_headline_batch_output.5.jsonl",
-            DATA_DIR / "openai_headline_batch_output.6.jsonl"
+            DATA_DIR / "openai_headline_batch_output.6.jsonl",
         ],
         "task_dep": [
             "process:submit_headlines_to_openai",
         ],
-        "clean": []
-    } 
+        "clean": [],
+    }
 
     yield {
         "name": "create_portfolios",
@@ -317,6 +308,7 @@ def task_process():
         "clean": [],
     }
 
+
 notebook_tasks = {
     "p05_chatgpt_price_forecasting_guide_ipynb": {
         "path": "./src/p05_chatgpt_price_forecasting_guide_ipynb.py",
@@ -324,7 +316,8 @@ notebook_tasks = {
         "targets": [],
     },
 }
-    
+
+
 # fmt: off
 def task_run_notebooks():
     """Preps the notebooks for presentation format.
@@ -537,10 +530,10 @@ def task_charts():
     }
 
 
-
 ###############################################################
 ## Task below is for LaTeX compilation
 ###############################################################
+
 
 def task_compile_latex_docs():
     """Compile the LaTeX documents to PDFs"""
@@ -551,14 +544,12 @@ def task_compile_latex_docs():
         "./reports/jpe.bst",
         "./reports/my_article_header.sty",
         "./reports/my_common_header.sty",
-
         OUTPUT_DIR / "label_ratio_table.tex",
         OUTPUT_DIR / "replication_table1_paper_sample.tex",
         OUTPUT_DIR / "replication_table1_full_sample.tex",
         OUTPUT_DIR / "summary_stats_crsp_universe.tex",
         OUTPUT_DIR / "summary_stats_news_by_year.tex",
         OUTPUT_DIR / "summary_stats_news_by_timing.tex",
-
         OUTPUT_DIR / "figure5_paper_sample.png",
         OUTPUT_DIR / "figure5_full_sample.png",
         OUTPUT_DIR / "portfolio_size_diagnostics_all.png",
@@ -582,6 +573,7 @@ def task_compile_latex_docs():
         ],
         "clean": True,
     }
+
 
 sphinx_targets = [
     "./docs/index.html",

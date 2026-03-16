@@ -26,8 +26,8 @@ df["is_overnight"] = (hour_et < MARKET_OPEN_HOUR) | (hour_et >= MARKET_CLOSE_HOU
 
 daily = (
     df.groupby("date_et")["is_overnight"]
-      .agg(n_total="size", n_overnight="sum")
-      .sort_index()
+    .agg(n_total="size", n_overnight="sum")
+    .sort_index()
 )
 daily["p_overnight"] = daily["n_overnight"] / daily["n_total"]
 daily["p_intraday"] = 1.0 - daily["p_overnight"]
@@ -36,9 +36,8 @@ plot_df = daily[["p_overnight", "p_intraday"]].copy()
 if ROLLING_DAYS and ROLLING_DAYS > 1:
     plot_df = plot_df.rolling(ROLLING_DAYS, min_periods=ROLLING_DAYS).mean()
 
-plot_long = (
-    plot_df.reset_index()
-          .melt(id_vars="date_et", var_name="series", value_name="proportion")
+plot_long = plot_df.reset_index().melt(
+    id_vars="date_et", var_name="series", value_name="proportion"
 )
 
 series_name = {
@@ -64,14 +63,22 @@ fig.add_hline(y=avg_overnight, line_dash="dash")
 fig.add_hline(y=avg_intraday, line_dash="dash")
 
 fig.add_annotation(
-    x="2022-01-01", y=0.70, xref="x", yref="y",
+    x="2022-01-01",
+    y=0.70,
+    xref="x",
+    yref="y",
     text=f"Avg Overnight = {avg_overnight:.2f}",
-    showarrow=False, xanchor="left"
+    showarrow=False,
+    xanchor="left",
 )
 fig.add_annotation(
-    x="2022-01-01", y=0.30, xref="x", yref="y",
+    x="2022-01-01",
+    y=0.30,
+    xref="x",
+    yref="y",
     text=f"Avg Intraday = {avg_intraday:.2f}",
-    showarrow=False, xanchor="left"
+    showarrow=False,
+    xanchor="left",
 )
 
 out = OUTPUT_DIR / "ravenpack_overnight_intraday_proportion.html"

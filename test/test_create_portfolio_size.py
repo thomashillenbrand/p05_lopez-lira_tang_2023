@@ -41,7 +41,9 @@ def test_counts_for_subset_builds_expected_columns_and_totals():
 def test_build_daily_counts_returns_all_expected_portfolios():
     df = pd.DataFrame(
         {
-            "date": pd.to_datetime(["2024-01-02", "2024-01-02", "2024-01-03", "2024-01-03"]).date,
+            "date": pd.to_datetime(
+                ["2024-01-02", "2024-01-02", "2024-01-03", "2024-01-03"]
+            ).date,
             "score": [1, -1, 1, -1],
             "eligible_restricted": [True, False, True, True],
             "eligible_not_small": [True, True, False, True],
@@ -74,7 +76,9 @@ def test_build_summary_aggregates_by_portfolio():
         }
     )
 
-    out = cps.build_summary(daily_counts).sort_values("portfolio").reset_index(drop=True)
+    out = (
+        cps.build_summary(daily_counts).sort_values("portfolio").reset_index(drop=True)
+    )
 
     p1 = out.loc[out["portfolio"] == "p1"].iloc[0]
     assert p1["trading_days"] == 2
@@ -113,7 +117,9 @@ def test_load_base_df_builds_expected_merge_and_flags(monkeypatch):
     sig = pd.DataFrame(
         {
             "ticker": ["AAA", "BBB", "CCC", "ZZZ"],
-            "date": pd.to_datetime(["2024-01-02", "2024-01-03", "2024-01-03", "2024-01-03"]),
+            "date": pd.to_datetime(
+                ["2024-01-02", "2024-01-03", "2024-01-03", "2024-01-03"]
+            ),
             "score": [1, -1, 1, 0],
         }
     )
@@ -122,7 +128,16 @@ def test_load_base_df_builds_expected_merge_and_flags(monkeypatch):
         {
             "permno": [1, 1, 2, 2, 3, 3],
             "ticker": ["AAA", "AAA", "BBB", "BBB", "CCC", "CCC"],
-            "date": pd.to_datetime(["2024-01-01", "2024-01-02", "2024-01-02", "2024-01-03", "2024-01-02", "2024-01-03"]),
+            "date": pd.to_datetime(
+                [
+                    "2024-01-01",
+                    "2024-01-02",
+                    "2024-01-02",
+                    "2024-01-03",
+                    "2024-01-02",
+                    "2024-01-03",
+                ]
+            ),
             "dlyopen": [10.0, 10.5, 20.0, 20.5, 30.0, 30.5],
             "dlyclose": [10.0, 11.0, 20.0, 21.0, 30.0, 30.1],
             "dlycap": [100, 110, 200, 210, 300, 290],
@@ -237,21 +252,39 @@ def test_main_runs_end_to_end_with_monkeypatched_dependencies(monkeypatch, tmp_p
     out_summary = tmp_path / "summary.csv"
     out_all = tmp_path / "all.png"
     out_grid = tmp_path / "grid.png"
+    out_all_html = tmp_path / "all.html"
+    out_grid_html = tmp_path / "grid.html"
 
     monkeypatch.setattr(cps, "OUT_COUNTS_CSV", out_counts)
     monkeypatch.setattr(cps, "OUT_SUMMARY_CSV", out_summary)
     monkeypatch.setattr(cps, "OUT_PLOT_ALL", out_all)
     monkeypatch.setattr(cps, "OUT_PLOT_GRID", out_grid)
+    monkeypatch.setattr(cps, "OUT_PLOT_ALL_HTML", out_all_html)
+    monkeypatch.setattr(cps, "OUT_PLOT_GRID_HTML", out_grid_html)
 
     saved_csvs = []
     saved_plots = []
+    saved_html = []
 
     def fake_to_csv(self, path, index=False):
         saved_csvs.append((path, index, self.copy()))
 
     monkeypatch.setattr(pd.DataFrame, "to_csv", fake_to_csv)
-    monkeypatch.setattr(cps, "make_overlay_plot", lambda d, p: saved_plots.append(("overlay", p, d.copy())))
-    monkeypatch.setattr(cps, "make_grid_plot", lambda d, p: saved_plots.append(("grid", p, d.copy())))
+    monkeypatch.setattr(
+        cps,
+        "make_overlay_plot",
+        lambda d, p: saved_plots.append(("overlay", p, d.copy())),
+    )
+    monkeypatch.setattr(
+        cps, "make_grid_plot", lambda d, p: saved_plots.append(("grid", p, d.copy()))
+    )
+    monkeypatch.setattr(
+        cps,
+        "write_html_wrapper",
+        lambda image_path, html_path, title: saved_html.append(
+            (image_path, html_path, title)
+        ),
+    )
 
     cps.main()
 
@@ -266,3 +299,11 @@ def test_main_runs_end_to_end_with_monkeypatched_dependencies(monkeypatch, tmp_p
     assert saved_plots[0][1] == out_all
     assert saved_plots[1][0] == "grid"
     assert saved_plots[1][1] == out_grid
+
+    assert len(saved_html) == 2
+    assert saved_html[0][0] == out_all
+    assert saved_html[0][1] == out_all_html
+    assert "Long and Short Counts" in saved_html[0][2]
+    assert saved_html[1][0] == out_grid
+    assert saved_html[1][1] == out_grid_html
+    assert "Diagnostics by Portfolio" in saved_html[1][2]

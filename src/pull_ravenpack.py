@@ -1,5 +1,4 @@
 # src/pull_ravenpack.py
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -15,7 +14,9 @@ START_DATE = config("START_DATE")
 END_DATE = config("END_DATE")
 
 
-def _pick_first_existing_column(db: wrds.Connection, schema: str, table: str, candidates: list[str]) -> str | None:
+def _pick_first_existing_column(
+    db: wrds.Connection, schema: str, table: str, candidates: list[str]
+) -> str | None:
     """
     Return the first column in `candidates` that exists in schema.table, else None.
     """
@@ -72,7 +73,10 @@ def pull_ravenpack(wrds_username: str = WRDS_USERNAME) -> pd.DataFrame:
         entity_name_select = "NULL::text AS entity_name"
     else:
         entity_name_select = f"{entity_name_col}::text AS entity_name"
-        print(f"Using entity name column from mappings: {mapping_schema}.{mapping_table}.{entity_name_col}", flush=True)
+        print(
+            f"Using entity name column from mappings: {mapping_schema}.{mapping_table}.{entity_name_col}",
+            flush=True,
+        )
 
     # NOTE:
     # - We REMOVE rp.entity_id (it is not present in at least some yearly tables on WRDS).

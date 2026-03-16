@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+
+\bibitem[{Lopez-Lira and Tang(2023)}]{LopezLiraTang2023}
+Lopez-Lira, Alejandro and Yuehua Tang. 2023.
+\newblock \enquote{Can ChatGPT Forecast Stock Price Movements? Return
+  Predictability and Large Language Models.}
+\newblock \emph{SSRN} Available at SSRN: https://ssrn.com/abstract=4412788.
+
+\end{thebibliography}

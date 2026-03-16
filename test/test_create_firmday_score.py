@@ -40,18 +40,26 @@ def test_load_outputs_parses_and_deduplicates(tmp_path, monkeypatch):
     rows = [
         {
             "custom_id": "rp-1",
-            "response": {"body": {"choices": [{"message": {"content": "YES\npositive"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "YES\npositive"}}]}
+            },
         },
         {
             "custom_id": "rp-2",
-            "response": {"body": {"choices": [{"message": {"content": "NO\nnegative"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "NO\nnegative"}}]}
+            },
         },
         {
             "custom_id": "rp-1",
-            "response": {"body": {"choices": [{"message": {"content": "YES\nduplicate"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "YES\nduplicate"}}]}
+            },
         },
     ]
-    output_file.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+    output_file.write_text(
+        "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+    )
 
     monkeypatch.setattr(cfs, "DATA_DIR", tmp_path)
 
@@ -77,14 +85,20 @@ def test_load_outputs_raises_when_parsed_df_is_empty(tmp_path, monkeypatch):
     rows = [
         {
             "custom_id": "rp-1",
-            "response": {"body": {"choices": [{"message": {"content": "MAYBE\nunclear"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "MAYBE\nunclear"}}]}
+            },
         },
         {
             "custom_id": "rp-2",
-            "response": {"body": {"choices": [{"message": {"content": "NEUTRAL\nno signal"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "NEUTRAL\nno signal"}}]}
+            },
         },
     ]
-    output_file.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+    output_file.write_text(
+        "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
+    )
 
     monkeypatch.setattr(cfs, "DATA_DIR", tmp_path)
 
@@ -101,8 +115,12 @@ def test_load_mapping_reads_and_normalizes(tmp_path, monkeypatch):
         "rp-1": {"ticker": "AAPL", "entity_name": "Apple", "date": "2025-01-03"},
     }
 
-    (tmp_path / "id_to_row_mapping.1.json").write_text(json.dumps(mapping_1), encoding="utf-8")
-    (tmp_path / "id_to_row_mapping.2.json").write_text(json.dumps(mapping_2), encoding="utf-8")
+    (tmp_path / "id_to_row_mapping.1.json").write_text(
+        json.dumps(mapping_1), encoding="utf-8"
+    )
+    (tmp_path / "id_to_row_mapping.2.json").write_text(
+        json.dumps(mapping_2), encoding="utf-8"
+    )
 
     monkeypatch.setattr(cfs, "DATA_DIR", tmp_path)
 
@@ -139,10 +157,16 @@ def test_load_trading_days_normalizes_and_sorts(monkeypatch):
 
 
 def test_next_td_respects_strict_parameter():
-    trading_days = pd.DatetimeIndex(pd.to_datetime(["2025-01-02", "2025-01-03", "2025-01-06"]))
+    trading_days = pd.DatetimeIndex(
+        pd.to_datetime(["2025-01-02", "2025-01-03", "2025-01-06"])
+    )
 
-    assert cfs.next_td(trading_days, pd.Timestamp("2025-01-03"), strict=False) == pd.Timestamp("2025-01-03")
-    assert cfs.next_td(trading_days, pd.Timestamp("2025-01-03"), strict=True) == pd.Timestamp("2025-01-06")
+    assert cfs.next_td(
+        trading_days, pd.Timestamp("2025-01-03"), strict=False
+    ) == pd.Timestamp("2025-01-03")
+    assert cfs.next_td(
+        trading_days, pd.Timestamp("2025-01-03"), strict=True
+    ) == pd.Timestamp("2025-01-06")
 
 
 def test_next_td_returns_nat_when_after_calendar_end():
@@ -154,13 +178,17 @@ def test_next_td_returns_nat_when_after_calendar_end():
 
 
 def test_compute_trade_date_maps_non_trading_days_forward():
-    trading_days = pd.DatetimeIndex(pd.to_datetime(["2025-01-02", "2025-01-03", "2025-01-06"]))
+    trading_days = pd.DatetimeIndex(
+        pd.to_datetime(["2025-01-02", "2025-01-03", "2025-01-06"])
+    )
     dates = pd.Series(pd.to_datetime(["2025-01-02", "2025-01-04", "2025-01-06"]))
 
     result = cfs.compute_trade_date(trading_days, dates)
 
     expected = pd.Series(pd.to_datetime(["2025-01-02", "2025-01-06", "2025-01-06"]))
-    pd.testing.assert_series_equal(result.reset_index(drop=True), expected, check_names=False)
+    pd.testing.assert_series_equal(
+        result.reset_index(drop=True), expected, check_names=False
+    )
 
 
 def test_main_builds_and_writes_daily_scores(monkeypatch, tmp_path):
@@ -176,7 +204,9 @@ def test_main_builds_and_writes_daily_scores(monkeypatch, tmp_path):
             "custom_id": ["rp-1", "rp-2", "rp-3", "rp-4"],
             "ticker": ["AAPL", "AAPL", "MSFT", "MSFT"],
             "entity_name": ["Apple", "Apple", "Microsoft", "Microsoft"],
-            "date": pd.to_datetime(["2025-01-04", "2025-01-04", "2025-01-03", "2025-01-04"]).date,
+            "date": pd.to_datetime(
+                ["2025-01-04", "2025-01-04", "2025-01-03", "2025-01-04"]
+            ).date,
         }
     )
     trading_days = pd.DatetimeIndex(pd.to_datetime(["2025-01-03", "2025-01-06"]))

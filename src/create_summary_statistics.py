@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -81,7 +82,9 @@ def create_crsp_summary() -> pd.DataFrame:
     crsp["dlyopen"] = pd.to_numeric(crsp["dlyopen"], errors="coerce")
     crsp["dlyclose"] = pd.to_numeric(crsp["dlyclose"], errors="coerce")
 
-    crsp = crsp.dropna(subset=["ticker", "date", "dlycap", "dlyopen", "dlyclose"]).copy()
+    crsp = crsp.dropna(
+        subset=["ticker", "date", "dlycap", "dlyopen", "dlyclose"]
+    ).copy()
     crsp = crsp[(crsp["dlyopen"] > 0) & (crsp["dlyclose"] > 0)].copy()
 
     # Market cap in millions
@@ -109,7 +112,9 @@ def create_news_by_year() -> pd.DataFrame:
     required = {"rp_entity_id", "rpa_date_utc", "headline"}
     missing = required.difference(rp.columns)
     if missing:
-        raise KeyError(f"{RAVENPACK_PATH.name} missing required columns: {sorted(missing)}")
+        raise KeyError(
+            f"{RAVENPACK_PATH.name} missing required columns: {sorted(missing)}"
+        )
 
     rp["rpa_date_utc"] = pd.to_datetime(rp["rpa_date_utc"], errors="coerce")
     rp["headline"] = rp["headline"].astype(str)
@@ -144,7 +149,9 @@ def create_news_by_timing() -> pd.DataFrame:
     required = {"rp_entity_id", "timestamp_utc", "headline"}
     missing = required.difference(rp.columns)
     if missing:
-        raise KeyError(f"{RAVENPACK_PATH.name} missing required columns: {sorted(missing)}")
+        raise KeyError(
+            f"{RAVENPACK_PATH.name} missing required columns: {sorted(missing)}"
+        )
 
     rp["timestamp_utc"] = pd.to_datetime(rp["timestamp_utc"], errors="coerce", utc=True)
     rp["headline"] = rp["headline"].astype(str)
@@ -168,7 +175,9 @@ def create_news_by_timing() -> pd.DataFrame:
     out["Per Day"] = (out["Headlines"] / out["Days"]).round(1)
 
     # Order like the paper
-    order = pd.Categorical(out["Timing"], categories=["Overnight", "Intraday"], ordered=True)
+    order = pd.Categorical(
+        out["Timing"], categories=["Overnight", "Intraday"], ordered=True
+    )
     out = out.assign(_order=order).sort_values("_order").drop(columns="_order")
 
     return out[["Timing", "Headlines", "% Total", "Firms", "Per Day"]]

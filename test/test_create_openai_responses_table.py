@@ -84,11 +84,15 @@ def test_load_outputs_parses_labels_and_deduplicates(tmp_path, monkeypatch):
     rows = [
         {
             "custom_id": "rp-1",
-            "response": {"body": {"choices": [{"message": {"content": "YES\\npositive"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "YES\\npositive"}}]}
+            },
         },
         {
             "custom_id": "rp-2",
-            "response": {"body": {"choices": [{"message": {"content": "NO: negative"}}]}},
+            "response": {
+                "body": {"choices": [{"message": {"content": "NO: negative"}}]}
+            },
         },
         {
             "custom_id": "rp-1",
@@ -124,7 +128,9 @@ def test_make_prop_table_builds_expected_counts_and_proportions():
     df = pd.DataFrame(
         {
             "label": ["YES", "NO", "UNKNOWN", "YES"],
-            "date": pd.to_datetime(["2022-01-01", "2023-01-01", "2020-01-01", "2025-01-01"]),
+            "date": pd.to_datetime(
+                ["2022-01-01", "2023-01-01", "2020-01-01", "2025-01-01"]
+            ),
         }
     )
 
