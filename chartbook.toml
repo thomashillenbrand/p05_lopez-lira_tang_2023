@@ -13,14 +13,18 @@ favicon_path = ""
 id = "SL&TH"
 pipeline_name = "ChatGPT Price Forecasting"
 pipeline_description = "A project to replicate an analysis of ChatGPT-4 price forecasting"
-lead_pipeline_developer = "Tom&Sophie"
-contributors = ["Tom&Sophie"]
-software_modules_command = "module load anaconda3/3.11.4 TeXLive/2023"
+lead_pipeline_developer = "Tom & Sophie"
+contributors = ["Sophie Lara & Tom Hillenbrand"]
 runs_on_grid_or_windows_or_other = "Windows/Linux/MacOS"
 git_repo_URL = "github.com/thomashillenbrand/p05_lopez-lira_tang_2023"
 README_file_path = "./README.md"
 
 [notebooks]
+
+[notebooks.p05_chatgpt_price_forecasting_guide_ipynb]
+notebook_name = "ChatGPT Price Forecasting Notebook"
+notebook_description = "Overview of the ChatGPT Price forecasting procedure and methodologies."
+notebook_path = "_output/_notebook_build/p05_chatgpt_price_forecasting_guide_ipynb.ipynb"
 
 
 [dataframes]
@@ -33,6 +37,8 @@ dataframe_docs_str = "Dataframe showing Ravenpack data split out as intraday or 
 how_is_pulled = "src/pull_ravenpack.py"
 path_to_parquet_data = "_data/RAVENPACK.parquet"
 date_col = "date_et"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [dataframes.crsp_daily_stock]
 dataframe_id = "crsp_daily_stock"
@@ -42,6 +48,8 @@ data_providers = ["CRSP"]
 how_is_pulled = "src/pull_CRSP_stock.py"
 path_to_parquet_data = "_data/CRSP_stock_daily.parquet"
 date_col = "dlycaldt"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [dataframes.daily_headline_polarity]
 dataframe_id = "daily_headline_polarity"
@@ -51,6 +59,8 @@ data_providers = ["RavenPack", "OpenAI"]
 how_is_pulled = "src/create_firmday_score.py"
 path_to_parquet_data = "_data/daily_headline_polarity.parquet"
 date_col = "date"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [dataframes.portfolio_returns]
 dataframe_id = "portfolio_returns"
@@ -60,6 +70,8 @@ data_providers = ["WRDS", "OpenAI"]
 how_is_pulled = "src/create_portfolios.py"
 path_to_parquet_data = "_data/portfolio_daily_returns.parquet"
 date_col = "date"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [dataframes.table1_paper_sample]
 dataframe_id = "table1_paper_sample"
@@ -69,6 +81,8 @@ data_providers = ["WRDS", "OpenAI"]
 how_is_pulled = "src/create_table1.py"
 path_to_parquet_data = "_output/table1_overnight_paper_sample.csv"
 date_col = "date"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [dataframes.table1_full_sample]
 dataframe_id = "table1_full_sample"
@@ -78,6 +92,8 @@ data_providers = ["WRDS", "OpenAI"]
 how_is_pulled = "src/create_table1.py"
 path_to_parquet_data = "_output/table1_overnight_full_sample.csv"
 date_col = "date"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [dataframes.openai_label_proportions]
 dataframe_id = "openai_label_proportions"
@@ -87,6 +103,8 @@ data_providers = ["RavenPack", "OpenAI"]
 how_is_pulled = "src/create_openai_responses_table.py"
 path_to_parquet_data = "_output/openai_output_label_proportions.csv"
 date_col = "date"
+links_to_data_providers = ["https://wrds-www.wharton.upenn.edu/"]
+
 
 [charts]
 

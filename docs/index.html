@@ -53,7 +53,7 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Chart List" href="charts.html" /> 
+    <link rel="next" title="&lt;no title&gt;" href="notebooks/SL%26TH/p05_chatgpt_price_forecasting_guide_ipynb.html" /> 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>   
   </head>
@@ -180,7 +180,12 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Pipeline Dataframes 📊</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/crsp_daily_stock.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:crsp_daily_stock</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/daily_headline_polarity.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:daily_headline_polarity</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/openai_label_proportions.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:openai_label_proportions</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/portfolio_returns.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:portfolio_returns</span></code> -</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/ravenpack.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:ravenpack</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/table1_full_sample.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:table1_full_sample</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/table1_paper_sample.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:table1_paper_sample</span></code> -</a></li>
 </ul>
 
     </div>
@@ -193,7 +198,7 @@
   <ul>
      
     <li>
-      <a href="charts/index/category/null.html">null (2)</a>
+      <a href="charts/index/category/null.html">null (4)</a>
     </li>
      
   </ul>
@@ -209,7 +214,19 @@
   <h3><a href="charts/index/tag.html">Tags</a></h3>
   <ul class="ablog-cloud">
      
-    <li class="ablog-cloud ablog-cloud-3">
+    <li class="ablog-cloud ablog-cloud-5">
+      <a href="charts/index/tag/crsp.html">CRSP</a>
+    </li>
+      
+    <li class="ablog-cloud ablog-cloud-5">
+      <a href="charts/index/tag/openai.html">OpenAI</a>
+    </li>
+      
+    <li class="ablog-cloud ablog-cloud-5">
+      <a href="charts/index/tag/ravenpack.html">RavenPack</a>
+    </li>
+      
+    <li class="ablog-cloud ablog-cloud-1">
       <a href="charts/index/tag/wrds.html">WRDS</a>
     </li>
      
@@ -393,7 +410,7 @@ document.write(`
                 <article class="bd-article">
                    <section class="tex2jax_ignore mathjax_ignore" id="chatgpt-price-forecasting">
 <h1>ChatGPT Price Forecasting<a class="headerlink" href="#chatgpt-price-forecasting" title="Link to this heading">#</a></h1>
-<p>Last updated: Feb 11, 2026, 1:39:30 AM</p>
+<p>Last updated: Mar 16, 2026, 12:32:32 AM</p>
 <section id="table-of-contents">
 <h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
@@ -405,14 +422,21 @@ document.write(`
 </ul>
 </div>
 <ul class="postlist-style-none postlist simple">
+<li class="ablog-post"><p class="ablog-post-title"><a class="reference internal" href="charts/SL%26TH.portfolio_size_diagnostics.html">Chart: Portfolio Size Diagnostics</a></p></li>
 <li class="ablog-post"><p class="ablog-post-title"><a class="reference internal" href="charts/SL%26TH.ravenpack_news_timing.html">Chart: Overnight vs Intraday RavenPack News</a></p></li>
-<li class="ablog-post"><p class="ablog-post-title"><a class="reference internal" href="charts/SL%26TH.crsp_daily_stock.html">Chart: Daily Closing Prices</a></p></li>
+<li class="ablog-post"><p class="ablog-post-title"><a class="reference internal" href="charts/SL%26TH.figure5_paper_sample.html">Chart: Figure 5: Portfolio Performance (Paper Sample)</a></p></li>
+<li class="ablog-post"><p class="ablog-post-title"><a class="reference internal" href="charts/SL%26TH.figure5_full_sample.html">Chart: Figure 5: Portfolio Performance (Full Sample)</a></p></li>
 </ul>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Pipeline Dataframes 📊</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/crsp_daily_stock.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:crsp_daily_stock</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/daily_headline_polarity.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:daily_headline_polarity</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/openai_label_proportions.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:openai_label_proportions</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/portfolio_returns.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:portfolio_returns</span></code> -</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/ravenpack.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:ravenpack</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/table1_full_sample.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:table1_full_sample</span></code> -</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframes/SL%26TH/table1_paper_sample.html">Dataframe: <code class="docutils literal notranslate"><span class="pre">SL&amp;TH:table1_paper_sample</span></code> -</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -440,16 +464,16 @@ document.write(`
 <td><p><a class="reference external" href="http://github.com/thomashillenbrand/p05_lopez-lira_tang_2023">github.com/thomashillenbrand/p05_lopez-lira_tang_2023</a></p></td>
 </tr>
 <tr class="row-even"><td><p>Pipeline Web Page</p></td>
-<td><p><a href="file:///home/tomhillenbrand/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page</p></td>
+<td><p><a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page</p></td>
 </tr>
 <tr class="row-odd"><td><p>Date of Last Code Update</p></td>
-<td><p>2026-02-10 19:39:21</p></td>
+<td><p>2026-03-15 19:32:07</p></td>
 </tr>
 <tr class="row-even"><td><p>OS Compatibility</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p>Linked Dataframes</p></td>
-<td><p><a class="reference internal" href="dataframes/SL%26TH/ravenpack.html"><span class="std std-doc">SL&amp;TH:ravenpack</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/crsp_daily_stock.html"><span class="std std-doc">SL&amp;TH:crsp_daily_stock</span></a><br></p></td>
+<td><p><a class="reference internal" href="dataframes/SL%26TH/ravenpack.html"><span class="std std-doc">SL&amp;TH:ravenpack</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/crsp_daily_stock.html"><span class="std std-doc">SL&amp;TH:crsp_daily_stock</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/daily_headline_polarity.html"><span class="std std-doc">SL&amp;TH:daily_headline_polarity</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/portfolio_returns.html"><span class="std std-doc">SL&amp;TH:portfolio_returns</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/table1_paper_sample.html"><span class="std std-doc">SL&amp;TH:table1_paper_sample</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/table1_full_sample.html"><span class="std std-doc">SL&amp;TH:table1_full_sample</span></a><br>  <a class="reference internal" href="dataframes/SL%26TH/openai_label_proportions.html"><span class="std std-doc">SL&amp;TH:openai_label_proportions</span></a><br></p></td>
 </tr>
 </tbody>
 </table>
@@ -618,11 +642,11 @@ the web, whereas the other loads cached data from the “_data” directory.</p>
                   
 <div class="prev-next-area">
     <a class="right-next"
-       href="charts.html"
+       href="notebooks/SL%26TH/p05_chatgpt_price_forecasting_guide_ipynb.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Chart List</p>
+        <p class="prev-next-title">&lt;no title&gt;</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
