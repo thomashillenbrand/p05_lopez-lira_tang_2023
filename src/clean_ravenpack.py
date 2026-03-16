@@ -1,5 +1,5 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,8 @@ FINAL_COLUMN_LIST = [
     "headline",
 ]
 
-#clean tickers
+
+# clean tickers
 def _norm_ticker_series(s: pd.Series) -> pd.Series:
     s = s.astype(str).str.upper().str.strip()
     s = s.str.replace(r"\s+", "", regex=True)
@@ -32,11 +33,12 @@ def _norm_ticker_series(s: pd.Series) -> pd.Series:
     return s
 
 
-#clean headlines for OSA dedupe
+# clean headlines for OSA dedupe
 def _norm_headline(s: str) -> str:
     s = (s or "").lower().strip()
     s = re.sub(r"\s+", " ", s)
     return s
+
 
 # OSA dedupe function for firm-day headlines
 # this is based on the filtering procedure in the paper where they remove headlines with OSA similarity > 0.60 to a higher-relevance headline for the same firm-day
@@ -80,7 +82,7 @@ def apply_osa_dedupe_firm_day(rp_filt: pd.DataFrame) -> pd.DataFrame:
         )
 
     print("\nApplying firm-day OSA headline dedupe (threshold > 0.60)...")
-    
+
     # Optional speed-up: only apply to firm-days with >1 headline
     sizes = rp_filt.groupby(["rp_entity_id", "rpa_date_utc"]).size()
     multi_keys = sizes[sizes > 1].index
@@ -97,19 +99,23 @@ def apply_osa_dedupe_firm_day(rp_filt: pd.DataFrame) -> pd.DataFrame:
     # Dedupe only multi-headline firm-days
     rp_multi_deduped = (
         rp_multi.groupby(["rp_entity_id", "rpa_date_utc"], group_keys=False)
-               .apply(_osa_dedupe_firm_day, include_groups=False)
-               .reset_index(drop=True)
+        .apply(_osa_dedupe_firm_day, include_groups=False)
+        .reset_index(drop=True)
     )
 
     return pd.concat([rp_single, rp_multi_deduped], ignore_index=True)
 
 
 def align_headlines_to_dates(df: pd.DataFrame) -> pd.DataFrame:
-    ts_et = pd.to_datetime(df["timestamp_utc"], utc=True, errors="coerce").dt.tz_convert("America/New_York")
+    ts_et = pd.to_datetime(
+        df["timestamp_utc"], utc=True, errors="coerce"
+    ).dt.tz_convert("America/New_York")
     df["timestamp_et"] = ts_et
 
     # Filter out intraday headlines (between 9:00 and 16:00 ET)
-    filtered_df = df[(df["timestamp_et"].dt.hour < 9) | (df["timestamp_et"].dt.hour >= 16)].copy()
+    filtered_df = df[
+        (df["timestamp_et"].dt.hour < 9) | (df["timestamp_et"].dt.hour >= 16)
+    ].copy()
 
     # Assign headline_date based on timestamp
     filtered_df["headline_date"] = np.where(
@@ -164,7 +170,9 @@ def main():
     print(f"RavenPack rows (after CRSP ticker filter): {n_rows_after_crsp:,}")
     print(f"CRSP unique tickers: {n_crsp_tickers:,}")
     print(f"RavenPack unique tickers (original): {n_unique_tickers_original:,}")
-    print(f"RavenPack unique tickers (after CRSP filter): {n_unique_tickers_after_crsp:,}")
+    print(
+        f"RavenPack unique tickers (after CRSP filter): {n_unique_tickers_after_crsp:,}"
+    )
 
     # Step 2: Firm-day OSA dedupe
     rp_deduped = apply_osa_dedupe_firm_day(rp_filt)
@@ -189,14 +197,17 @@ def main():
     print("\n=== Step 3: After Dropping Intraday News ===")
     print(f"Rows before timing filter (after OSA): {n_rows_before_timing:,}")
     print(f"Rows after dropping intraday: {n_rows_after_timing:,}")
-    print(f"Unique tickers before dropping intraday: {n_unique_tickers_before_timing:,}")
+    print(
+        f"Unique tickers before dropping intraday: {n_unique_tickers_before_timing:,}"
+    )
     print(f"Unique tickers after dropping intraday: {n_unique_tickers_after_timing:,}")
 
     # Save the final output to the clean file
     rp_final.to_parquet(OUTPUT_FILE, index=False)
     print(f"\nSaved final cleaned RavenPack parquet to: {OUTPUT_FILE}")
 
-#in the future we can overwrite the original RavenPack parquet with the cleaned version, but for now I had it saved it to a new file to preserve the original raw data and have an easier time comparing the two versions as we iterate on the cleaning steps
+
+# in the future we can overwrite the original RavenPack parquet with the cleaned version, but for now I had it saved it to a new file to preserve the original raw data and have an easier time comparing the two versions as we iterate on the cleaning steps
 
 if __name__ == "__main__":
     main()

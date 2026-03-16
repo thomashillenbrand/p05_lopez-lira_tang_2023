@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 from openai import OpenAI
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -126,13 +127,17 @@ def download_file_content(client: OpenAI, file_id: str, out_path: Path) -> None:
 
 def main():
     """Main method to drive the process of creating, submitting, and downloading the OpenAI batch job and its results."""
-    
+
     result_paths = list(DATA_DIR.glob("openai_headline_batch_output.*.jsonl"))
     if result_paths:
-        print(f"Batch output files already exist in {DATA_DIR}: {[p.name for p in result_paths]}")
-        print("Skipping batch job submission to avoid duplicates. If you want to resubmit, please remove existing batch output files first.")
+        print(
+            f"Batch output files already exist in {DATA_DIR}: {[p.name for p in result_paths]}"
+        )
+        print(
+            "Skipping batch job submission to avoid duplicates. If you want to resubmit, please remove existing batch output files first."
+        )
         return
-    
+
     if not OPENAI_API_KEY:
         raise EnvironmentError("OPENAI_API_KEY is not set in the environment.")
 

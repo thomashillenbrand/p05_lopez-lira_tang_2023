@@ -281,7 +281,9 @@ def test_main_runs_end_to_end_with_monkeypatched_dependencies(monkeypatch, tmp_p
     monkeypatch.setattr(
         cps,
         "write_html_wrapper",
-        lambda image_path, html_path, title: saved_html.append((image_path, html_path, title)),
+        lambda image_path, html_path, title: saved_html.append(
+            (image_path, html_path, title)
+        ),
     )
 
     cps.main()

@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 
 import pandas as pd
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -119,7 +120,9 @@ def make_prop_table(df: pd.DataFrame) -> pd.DataFrame:
     out = pd.DataFrame(
         {
             "label": LABELS,
-            "proportion_2021_2024_sample_period": [sample_props.get(l, 0.0) for l in LABELS],
+            "proportion_2021_2024_sample_period": [
+                sample_props.get(l, 0.0) for l in LABELS
+            ],
             "proportion_full_sample": [full_props.get(l, 0.0) for l in LABELS],
             "count_2021_2024_sample_period": [sample_counts.get(l, 0) for l in LABELS],
             "count_full_sample": [full_counts.get(l, 0) for l in LABELS],
