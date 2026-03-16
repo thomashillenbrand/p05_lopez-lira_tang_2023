@@ -1,5 +1,5 @@
 ---
-date: 2026-03-15 19:50:22
+date: 2026-03-15 20:19:58
 tags: CRSP, RavenPack, OpenAI
 category: 
 ---
@@ -74,7 +74,7 @@ Replication of Figure 5 over the paper sample period.
 | Contributors                    | Sophie Lara & Tom Hillenbrand           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
 | Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-03-15 19:50:22           |
+| Date of Last Code Update        | 2026-03-15 20:19:58           |
 | OS Compatibility                |  |
 | Linked Dataframes               |  [SL&TH:ravenpack](../dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)<br>  [SL&TH:daily_headline_polarity](../dataframes/SL&TH/daily_headline_polarity.md)<br>  [SL&TH:portfolio_returns](../dataframes/SL&TH/portfolio_returns.md)<br>  [SL&TH:table1_paper_sample](../dataframes/SL&TH/table1_paper_sample.md)<br>  [SL&TH:table1_full_sample](../dataframes/SL&TH/table1_full_sample.md)<br>  [SL&TH:openai_label_proportions](../dataframes/SL&TH/openai_label_proportions.md)<br>  |
 
