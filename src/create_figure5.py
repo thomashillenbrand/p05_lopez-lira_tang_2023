@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 import matplotlib.dates as mdates
@@ -133,6 +134,7 @@ def export_series(df: pd.DataFrame, out_csv: Path) -> None:
 
 
 def write_html_wrapper(image_path: Path, html_path: Path, title: str) -> None:
+    encoded = base64.b64encode(image_path.read_bytes()).decode("utf-8")
     html = f"""
 <!DOCTYPE html>
 <html>
@@ -147,7 +149,7 @@ img {{ max-width:100%; height:auto; }}
 </head>
 <body>
 <div class="wrap">
-<img src="{image_path.name}" alt="{title}">
+<img src="data:image/png;base64,{encoded}" alt="{title}">
 </div>
 </body>
 </html>

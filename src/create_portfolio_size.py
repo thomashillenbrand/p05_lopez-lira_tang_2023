@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -278,7 +279,8 @@ def make_grid_plot(daily_counts: pd.DataFrame, out_path: Path) -> None:
 
 
 def write_html_wrapper(image_path: Path, html_path: Path, title: str) -> None:
-    """Write a minimal HTML page that displays a local PNG image."""
+    """Write a self-contained HTML page with the PNG embedded as base64."""
+    encoded = base64.b64encode(image_path.read_bytes()).decode("utf-8")
     html = f"""
 <!DOCTYPE html>
 <html>
@@ -293,7 +295,7 @@ img {{ max-width:100%; height:auto; }}
 </head>
 <body>
 <div class="wrap">
-<img src="{image_path.name}" alt="{title}">
+<img src="data:image/png;base64,{encoded}" alt="{title}">
 </div>
 </body>
 </html>
