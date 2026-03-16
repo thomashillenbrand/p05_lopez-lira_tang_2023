@@ -120,18 +120,18 @@ dataframe_id = "portfolio_returns"
 chart_name = "Figure 5: Portfolio Performance (Paper Sample)"
 chart_docs_str = "Replication of Figure 5 over the paper sample period."
 short_description_chart = "Cumulative portfolio value for the long-short strategy and benchmark variants over the paper sample."
-path_to_html_chart = "_output/figure5_paper_sample.png"
+path_to_html_chart = "_output/figure5_paper_sample.html"
 
 [charts.figure5_full_sample]
 dataframe_id = "portfolio_returns"
 chart_name = "Figure 5: Portfolio Performance (Full Sample)"
 chart_docs_str = "Replication of Figure 5 over the full available sample."
 short_description_chart = "Cumulative portfolio value for the long-short strategy and benchmark variants over the full sample."
-path_to_html_chart = "_output/figure5_full_sample.png"
+path_to_html_chart = "_output/figure5_full_sample.html"
 
 [charts.portfolio_size_diagnostics]
 dataframe_id = "portfolio_returns"
 chart_name = "Portfolio Size Diagnostics"
 chart_docs_str = "Daily long and short portfolio counts for the main strategy and restricted variants."
 short_description_chart = "Number of stocks in the long and short portfolios through time."
-path_to_html_chart = "_output/portfolio_size_diagnostics_all.png"
+path_to_html_chart = "_output/portfolio_size_diagnostics_all.html"

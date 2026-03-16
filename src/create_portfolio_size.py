@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -16,6 +17,9 @@ OUT_COUNTS_CSV = OUTPUT_DIR / "portfolio_size_diagnostics_daily.csv"
 OUT_SUMMARY_CSV = OUTPUT_DIR / "portfolio_size_diagnostics_summary.csv"
 OUT_PLOT_ALL = OUTPUT_DIR / "portfolio_size_diagnostics_all.png"
 OUT_PLOT_GRID = OUTPUT_DIR / "portfolio_size_diagnostics_grid.png"
+OUT_PLOT_ALL_HTML = OUTPUT_DIR / "portfolio_size_diagnostics_all.html"
+OUT_PLOT_GRID_HTML = OUTPUT_DIR / "portfolio_size_diagnostics_grid.html"
+
 
 def norm_ticker(s: pd.Series) -> pd.Series:
     return s.astype(str).str.upper().str.strip()
@@ -33,7 +37,9 @@ def load_base_df() -> pd.DataFrame:
     sig = pd.read_parquet(SCORES_PATH)
     need_sig = {"ticker", "date", "score"}
     if not need_sig.issubset(sig.columns):
-        raise KeyError(f"{SCORES_PATH.name} must include {need_sig}, got {set(sig.columns)}")
+        raise KeyError(
+            f"{SCORES_PATH.name} must include {need_sig}, got {set(sig.columns)}"
+        )
 
     sig = sig.copy()
     sig["ticker"] = norm_ticker(sig["ticker"])
@@ -57,7 +63,9 @@ def load_base_df() -> pd.DataFrame:
         "primaryexch",
     }
     if not need_crsp.issubset(crsp.columns):
-        raise KeyError(f"{CRSP_PATH.name} must include {need_crsp}, got {set(crsp.columns)}")
+        raise KeyError(
+            f"{CRSP_PATH.name} must include {need_crsp}, got {set(crsp.columns)}"
+        )
 
     crsp = crsp.copy()
     crsp["ticker"] = norm_ticker(crsp["ticker"])
@@ -78,23 +86,23 @@ def load_base_df() -> pd.DataFrame:
     )
     crsp = crsp.merge(nyse_bp, on="date", how="left")
 
-    crsp["eligible_restricted"] = (
-        (crsp["prev_close"] > 5)
-        & (crsp["lag_cap"] > crsp["nyse_cap_p20"])
+    crsp["eligible_restricted"] = (crsp["prev_close"] > 5) & (
+        crsp["lag_cap"] > crsp["nyse_cap_p20"]
     )
 
     # Keep rows where lagged characteristics exist
-    crsp = crsp.dropna(subset=["permno", "ticker", "date", "prev_close", "lag_cap"]).copy()
+    crsp = crsp.dropna(
+        subset=["permno", "ticker", "date", "prev_close", "lag_cap"]
+    ).copy()
 
     # ---------------------------
     # Mapping: match your current create_portfolios.py
     # ---------------------------
     # If your current create_portfolios.py uses a different mapping rule,
     # copy that exact block here.
-    permno_map = (
-        crsp.sort_values(["ticker", "date", "permno"])[["ticker", "date", "permno"]]
-        .drop_duplicates(subset=["ticker", "date"], keep="first")
-    )
+    permno_map = crsp.sort_values(["ticker", "date", "permno"])[
+        ["ticker", "date", "permno"]
+    ].drop_duplicates(subset=["ticker", "date"], keep="first")
 
     sig_tr = sig_tr.merge(permno_map, on=["ticker", "date"], how="inner")
 
@@ -172,7 +180,11 @@ def build_daily_counts(df: pd.DataFrame) -> pd.DataFrame:
         )
     )
 
-    out = pd.concat(pieces, ignore_index=True).sort_values(["portfolio", "date"]).reset_index(drop=True)
+    out = (
+        pd.concat(pieces, ignore_index=True)
+        .sort_values(["portfolio", "date"])
+        .reset_index(drop=True)
+    )
     return out
 
 
@@ -265,6 +277,31 @@ def make_grid_plot(daily_counts: pd.DataFrame, out_path: Path) -> None:
     plt.close(fig)
 
 
+def write_html_wrapper(image_path: Path, html_path: Path, title: str) -> None:
+    """Write a minimal HTML page that displays a local PNG image."""
+    html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+<style>
+body {{ margin:0; font-family:sans-serif; background:white; }}
+.wrap {{ padding:20px; text-align:center; }}
+img {{ max-width:100%; height:auto; }}
+</style>
+</head>
+<body>
+<div class="wrap">
+<img src="{image_path.name}" alt="{title}">
+</div>
+</body>
+</html>
+"""
+    html_path.parent.mkdir(parents=True, exist_ok=True)
+    html_path.write_text(html.strip(), encoding="utf-8")
+
+
 def main() -> None:
     df = load_base_df()
     daily_counts = build_daily_counts(df)
@@ -276,12 +313,25 @@ def main() -> None:
     make_overlay_plot(daily_counts, OUT_PLOT_ALL)
     make_grid_plot(daily_counts, OUT_PLOT_GRID)
 
+    write_html_wrapper(
+        image_path=OUT_PLOT_ALL,
+        html_path=OUT_PLOT_ALL_HTML,
+        title="Portfolio Size Diagnostics: Long and Short Counts",
+    )
+    write_html_wrapper(
+        image_path=OUT_PLOT_GRID,
+        html_path=OUT_PLOT_GRID_HTML,
+        title="Portfolio Size Diagnostics by Portfolio",
+    )
+
     print("\n==== Portfolio Size Diagnostics Summary ====\n")
     print(summary.to_string(index=False))
     print(f"\nWrote {OUT_COUNTS_CSV}")
     print(f"Wrote {OUT_SUMMARY_CSV}")
     print(f"Wrote {OUT_PLOT_ALL}")
     print(f"Wrote {OUT_PLOT_GRID}")
+    print(f"Wrote {OUT_PLOT_ALL_HTML}")
+    print(f"Wrote {OUT_PLOT_GRID_HTML}")
 
 
 if __name__ == "__main__":

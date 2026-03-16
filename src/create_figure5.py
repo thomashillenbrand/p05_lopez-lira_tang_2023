@@ -6,6 +6,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import pandas as pd
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -15,6 +16,8 @@ PORT_PATH = DATA_DIR / "portfolio_daily_returns.parquet"
 
 OUT_PAPER_PNG = OUTPUT_DIR / "figure5_paper_sample.png"
 OUT_FULL_PNG = OUTPUT_DIR / "figure5_full_sample.png"
+OUT_PAPER_HTML = OUTPUT_DIR / "figure5_paper_sample.html"
+OUT_FULL_HTML = OUTPUT_DIR / "figure5_full_sample.html"
 
 OUT_PAPER_CSV = OUTPUT_DIR / "figure5_paper_sample_series.csv"
 OUT_FULL_CSV = OUTPUT_DIR / "figure5_full_sample_series.csv"
@@ -129,6 +132,30 @@ def export_series(df: pd.DataFrame, out_csv: Path) -> None:
     ].to_csv(out_csv, index=False)
 
 
+def write_html_wrapper(image_path: Path, html_path: Path, title: str) -> None:
+    html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+<style>
+body {{ margin:0; font-family:sans-serif; background:white; }}
+.wrap {{ padding:20px; text-align:center; }}
+img {{ max-width:100%; height:auto; }}
+</style>
+</head>
+<body>
+<div class="wrap">
+<img src="{image_path.name}" alt="{title}">
+</div>
+</body>
+</html>
+"""
+    html_path.parent.mkdir(parents=True, exist_ok=True)
+    html_path.write_text(html.strip(), encoding="utf-8")
+
+
 def main() -> None:
     df = pd.read_parquet(PORT_PATH)
 
@@ -136,20 +163,30 @@ def main() -> None:
     full = prepare_series(df)
     export_series(full, OUT_FULL_CSV)
     make_plot(full, OUT_FULL_PNG)
+    write_html_wrapper(
+        image_path=OUT_FULL_PNG,
+        html_path=OUT_FULL_HTML,
+        title="Figure 5 - Full Sample",
+    )
 
     # Paper sample
     paper = df.copy()
     paper["date"] = pd.to_datetime(paper["date"], errors="coerce")
-    paper = paper[
-        (paper["date"] >= PAPER_START) & (paper["date"] <= PAPER_END)
-    ].copy()
+    paper = paper[(paper["date"] >= PAPER_START) & (paper["date"] <= PAPER_END)].copy()
 
     paper = prepare_series(paper)
     export_series(paper, OUT_PAPER_CSV)
     make_plot(paper, OUT_PAPER_PNG)
+    write_html_wrapper(
+        image_path=OUT_PAPER_PNG,
+        html_path=OUT_PAPER_HTML,
+        title="Figure 5 - Paper Sample",
+    )
 
     print(f"Wrote {OUT_PAPER_PNG}")
     print(f"Wrote {OUT_FULL_PNG}")
+    print(f"Wrote {OUT_PAPER_HTML}")
+    print(f"Wrote {OUT_FULL_HTML}")
     print(f"Wrote {OUT_PAPER_CSV}")
     print(f"Wrote {OUT_FULL_CSV}")
 
