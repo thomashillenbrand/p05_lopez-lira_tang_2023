@@ -1,21 +1,18 @@
-# Dataframe: `SL&TH:crsp_daily_stock` - 
+# Dataframe: `SL&TH:daily_headline_polarity` - 
 
-This dataframe contains daily stock data from CRSP, including closing prices and other relevant fields.
+Firm-day sentiment scores derived from OpenAI classifications of RavenPack headlines.
 
 
 ## DataFrame Glimpse
 
 ```
-Rows: 7467730
-Columns: 8
-$ permno               <i64> 10026
-$ permco               <i64> 7976
-$ ticker               <str> 'JJSF'
-$ primaryexch          <str> 'Q'
-$ date        <datetime[ns]> 2021-10-01 00:00:00
-$ dlycap               <f64> 2932065.76
-$ dlyopen              <f64> 153.85
-$ dlyclose             <f64> 153.64
+Rows: 176968
+Columns: 5
+$ ticker       <str> 'ZYME'
+$ date        <date> 2026-01-06
+$ n_headlines  <i64> 1
+$ score_sum    <i64> 0
+$ score        <i64> 0
 
 
 ```
@@ -24,16 +21,16 @@ $ dlyclose             <f64> 153.64
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)                                       |
-| Data Sources                   | WRDS                                        |
-| Data Providers                 | CRSP                                      |
+| Dataframe ID                   | [daily_headline_polarity](../dataframes/SL&TH/daily_headline_polarity.md)                                       |
+| Data Sources                   | RavenPack, OpenAI                                        |
+| Data Providers                 | RavenPack, OpenAI                                      |
 | Links to Providers             |                              |
 | Topic Tags                     |                                           |
 | Type of Data Access            |                                   |
-| How is data pulled?            | src/pull_CRSP_stock.py                                                    |
-| Data available up to (min)     | N/A (large file)                                                             |
-| Data available up to (max)     | N/A (large file)                                                             |
-| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/CRSP_stock_daily.parquet                                                   |
+| How is data pulled?            | src/create_firmday_score.py                                                    |
+| Data available up to (min)     | 2026-01-30 00:00:00                                                             |
+| Data available up to (max)     | 2026-01-30 00:00:00                                                             |
+| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/daily_headline_polarity.parquet                                                   |
 
 
 **Linked Charts:**
