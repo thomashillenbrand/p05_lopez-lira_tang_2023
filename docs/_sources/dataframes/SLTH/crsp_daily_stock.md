@@ -1,4 +1,4 @@
-# Dataframe: `SL&TH:crsp_daily_stock` - 
+# Dataframe: `SLTH:crsp_daily_stock` - 
 
 This dataframe contains daily stock data from CRSP, including closing prices and other relevant fields.
 
@@ -24,7 +24,7 @@ $ dlyclose             <f64> 153.64
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)                                       |
+| Dataframe ID                   | [crsp_daily_stock](../dataframes/SLTH/crsp_daily_stock.md)                                       |
 | Data Sources                   | WRDS                                        |
 | Data Providers                 | CRSP                                      |
 | Links to Providers             | https://wrds-www.wharton.upenn.edu/                             |
@@ -45,13 +45,13 @@ $ dlyclose             <f64> 153.64
 
 | Pipeline Name                   | ChatGPT Price Forecasting                       |
 |---------------------------------|--------------------------------------------------------|
-| Pipeline ID                     | [SL&TH](../index.md)              |
-| Lead Pipeline Developer         | Tom & Sophie             |
-| Contributors                    | Sophie Lara & Tom Hillenbrand           |
+| Pipeline ID                     | [SLTH](../index.md)              |
+| Lead Pipeline Developer         | Tom and Sophie             |
+| Contributors                    | Sophie Lara and Tom Hillenbrand           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
 | Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-03-15 20:19:58           |
+| Date of Last Code Update        | 2026-03-15 20:29:03           |
 | OS Compatibility                |  |
-| Linked Dataframes               |  [SL&TH:ravenpack](../dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)<br>  [SL&TH:daily_headline_polarity](../dataframes/SL&TH/daily_headline_polarity.md)<br>  [SL&TH:portfolio_returns](../dataframes/SL&TH/portfolio_returns.md)<br>  [SL&TH:table1_paper_sample](../dataframes/SL&TH/table1_paper_sample.md)<br>  [SL&TH:table1_full_sample](../dataframes/SL&TH/table1_full_sample.md)<br>  [SL&TH:openai_label_proportions](../dataframes/SL&TH/openai_label_proportions.md)<br>  |
+| Linked Dataframes               |  [SLTH:ravenpack](../dataframes/SLTH/ravenpack.md)<br>  [SLTH:crsp_daily_stock](../dataframes/SLTH/crsp_daily_stock.md)<br>  [SLTH:daily_headline_polarity](../dataframes/SLTH/daily_headline_polarity.md)<br>  [SLTH:portfolio_returns](../dataframes/SLTH/portfolio_returns.md)<br>  [SLTH:table1_paper_sample](../dataframes/SLTH/table1_paper_sample.md)<br>  [SLTH:table1_full_sample](../dataframes/SLTH/table1_full_sample.md)<br>  [SLTH:openai_label_proportions](../dataframes/SLTH/openai_label_proportions.md)<br>  |
 
 

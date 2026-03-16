@@ -1,5 +1,5 @@
 ---
-date: 2026-03-15 20:19:58
+date: 2026-03-15 20:29:03
 tags: WRDS
 category: 
 ---
@@ -9,11 +9,11 @@ Daily proportion of RavenPack headlines posted outside vs inside market hours (E
 
 ## Chart
 ```{raw} html
-<iframe src="../_static/SL&TH/ravenpack_news_timing.html" height="500px" width="100%"></iframe>
+<iframe src="../_static/SLTH/ravenpack_news_timing.html" height="500px" width="100%"></iframe>
 
 <p style="text-align: center;">Sources: WRDS</p>
 ```
-[Full Screen Chart](../download_chart/SL&TH/ravenpack_news_timing.html)
+[Full Screen Chart](../download_chart/SLTH/ravenpack_news_timing.html)
 
 
 
@@ -35,14 +35,14 @@ Overnight vs Intraday RavenPack News
 | Data Release Timing    |                                     |
 | Seasonal Adjustment    |                                     |
 | Units                  |                                                   |
-| HTML Chart             | [HTML](../download_chart/SL&TH/ravenpack_news_timing.html)    |
+| HTML Chart             | [HTML](../download_chart/SLTH/ravenpack_news_timing.html)    |
 
 
 ## Dataframe Manifest
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [ravenpack](../dataframes/SL&TH/ravenpack.md)                                       |
+| Dataframe ID                   | [ravenpack](../dataframes/SLTH/ravenpack.md)                                       |
 | Data Sources                   | WRDS                                        |
 | Data Providers                 | RavenPack                                      |
 | Links to Providers             | https://wrds-www.wharton.upenn.edu/                             |
@@ -57,7 +57,7 @@ Overnight vs Intraday RavenPack News
 **Linked Charts:**
 
 
-- [SL&TH:ravenpack_news_timing](../../charts/SL&TH.ravenpack_news_timing.md)
+- [SLTH:ravenpack_news_timing](../../charts/SLTH.ravenpack_news_timing.md)
 
 
 
@@ -65,12 +65,12 @@ Overnight vs Intraday RavenPack News
 
 | Pipeline Name                   | ChatGPT Price Forecasting                       |
 |---------------------------------|--------------------------------------------------------|
-| Pipeline ID                     | [SL&TH](../index.md)              |
-| Lead Pipeline Developer         | Tom & Sophie             |
-| Contributors                    | Sophie Lara & Tom Hillenbrand           |
+| Pipeline ID                     | [SLTH](../index.md)              |
+| Lead Pipeline Developer         | Tom and Sophie             |
+| Contributors                    | Sophie Lara and Tom Hillenbrand           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
 | Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-03-15 20:19:58           |
+| Date of Last Code Update        | 2026-03-15 20:29:03           |
 | OS Compatibility                |  |
-| Linked Dataframes               |  [SL&TH:ravenpack](../dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)<br>  [SL&TH:daily_headline_polarity](../dataframes/SL&TH/daily_headline_polarity.md)<br>  [SL&TH:portfolio_returns](../dataframes/SL&TH/portfolio_returns.md)<br>  [SL&TH:table1_paper_sample](../dataframes/SL&TH/table1_paper_sample.md)<br>  [SL&TH:table1_full_sample](../dataframes/SL&TH/table1_full_sample.md)<br>  [SL&TH:openai_label_proportions](../dataframes/SL&TH/openai_label_proportions.md)<br>  |
+| Linked Dataframes               |  [SLTH:ravenpack](../dataframes/SLTH/ravenpack.md)<br>  [SLTH:crsp_daily_stock](../dataframes/SLTH/crsp_daily_stock.md)<br>  [SLTH:daily_headline_polarity](../dataframes/SLTH/daily_headline_polarity.md)<br>  [SLTH:portfolio_returns](../dataframes/SLTH/portfolio_returns.md)<br>  [SLTH:table1_paper_sample](../dataframes/SLTH/table1_paper_sample.md)<br>  [SLTH:table1_full_sample](../dataframes/SLTH/table1_full_sample.md)<br>  [SLTH:openai_label_proportions](../dataframes/SLTH/openai_label_proportions.md)<br>  |
 

@@ -1,4 +1,4 @@
-# Dataframe: `SL&TH:portfolio_returns` - 
+# Dataframe: `SLTH:portfolio_returns` - 
 
 Daily returns of headline-based trading portfolios constructed from RavenPack sentiment signals.
 
@@ -36,7 +36,7 @@ $ ret_ir_ls          <f64> 0.016391048011124218
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [portfolio_returns](../dataframes/SL&TH/portfolio_returns.md)                                       |
+| Dataframe ID                   | [portfolio_returns](../dataframes/SLTH/portfolio_returns.md)                                       |
 | Data Sources                   | CRSP, RavenPack, OpenAI                                        |
 | Data Providers                 | WRDS, OpenAI                                      |
 | Links to Providers             | https://wrds-www.wharton.upenn.edu/                             |
@@ -51,11 +51,11 @@ $ ret_ir_ls          <f64> 0.016391048011124218
 **Linked Charts:**
 
 
-- [SL&TH:figure5_paper_sample](../../charts/SL&TH.figure5_paper_sample.md)
+- [SLTH:figure5_paper_sample](../../charts/SLTH.figure5_paper_sample.md)
 
-- [SL&TH:figure5_full_sample](../../charts/SL&TH.figure5_full_sample.md)
+- [SLTH:figure5_full_sample](../../charts/SLTH.figure5_full_sample.md)
 
-- [SL&TH:portfolio_size_diagnostics](../../charts/SL&TH.portfolio_size_diagnostics.md)
+- [SLTH:portfolio_size_diagnostics](../../charts/SLTH.portfolio_size_diagnostics.md)
 
 
 
@@ -63,13 +63,13 @@ $ ret_ir_ls          <f64> 0.016391048011124218
 
 | Pipeline Name                   | ChatGPT Price Forecasting                       |
 |---------------------------------|--------------------------------------------------------|
-| Pipeline ID                     | [SL&TH](../index.md)              |
-| Lead Pipeline Developer         | Tom & Sophie             |
-| Contributors                    | Sophie Lara & Tom Hillenbrand           |
+| Pipeline ID                     | [SLTH](../index.md)              |
+| Lead Pipeline Developer         | Tom and Sophie             |
+| Contributors                    | Sophie Lara and Tom Hillenbrand           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
 | Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-03-15 20:19:58           |
+| Date of Last Code Update        | 2026-03-15 20:29:03           |
 | OS Compatibility                |  |
-| Linked Dataframes               |  [SL&TH:ravenpack](../dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)<br>  [SL&TH:daily_headline_polarity](../dataframes/SL&TH/daily_headline_polarity.md)<br>  [SL&TH:portfolio_returns](../dataframes/SL&TH/portfolio_returns.md)<br>  [SL&TH:table1_paper_sample](../dataframes/SL&TH/table1_paper_sample.md)<br>  [SL&TH:table1_full_sample](../dataframes/SL&TH/table1_full_sample.md)<br>  [SL&TH:openai_label_proportions](../dataframes/SL&TH/openai_label_proportions.md)<br>  |
+| Linked Dataframes               |  [SLTH:ravenpack](../dataframes/SLTH/ravenpack.md)<br>  [SLTH:crsp_daily_stock](../dataframes/SLTH/crsp_daily_stock.md)<br>  [SLTH:daily_headline_polarity](../dataframes/SLTH/daily_headline_polarity.md)<br>  [SLTH:portfolio_returns](../dataframes/SLTH/portfolio_returns.md)<br>  [SLTH:table1_paper_sample](../dataframes/SLTH/table1_paper_sample.md)<br>  [SLTH:table1_full_sample](../dataframes/SLTH/table1_full_sample.md)<br>  [SLTH:openai_label_proportions](../dataframes/SLTH/openai_label_proportions.md)<br>  |
 
 

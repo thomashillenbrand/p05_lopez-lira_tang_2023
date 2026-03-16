@@ -4,17 +4,17 @@ chartbook_format_version = "0.0.2"
 
 [site]
 title = "ChatGPT Price Forecasting"
-author = "Tom&Sophie"
-copyright = "2025"
+author = "Sophie Lara and Tom Hillenbrand"
+copyright = "2026"
 logo_path = ""
 favicon_path = ""
 
 [pipeline]
-id = "SL&TH"
+id = "SLTH"
 pipeline_name = "ChatGPT Price Forecasting"
 pipeline_description = "A project to replicate an analysis of ChatGPT-4 price forecasting"
-lead_pipeline_developer = "Tom & Sophie"
-contributors = ["Sophie Lara & Tom Hillenbrand"]
+lead_pipeline_developer = "Tom and Sophie"
+contributors = ["Sophie Lara and Tom Hillenbrand"]
 runs_on_grid_or_windows_or_other = "Windows/Linux/MacOS"
 git_repo_URL = "github.com/thomashillenbrand/p05_lopez-lira_tang_2023"
 README_file_path = "./README.md"

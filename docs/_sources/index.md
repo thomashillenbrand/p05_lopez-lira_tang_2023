@@ -8,7 +8,7 @@ Last updated: {sub-ref}`today`
 ```{toctree}
 :maxdepth: 1
 :caption: Notebooks 📖
-notebooks/SL&TH/p05_chatgpt_price_forecasting_guide_ipynb.html
+notebooks/SLTH/p05_chatgpt_price_forecasting_guide_ipynb.html
 ```
 
 
@@ -27,13 +27,13 @@ charts.md
 ```{toctree}
 :maxdepth: 1
 :caption: Pipeline Dataframes 📊
-dataframes/SL&TH/crsp_daily_stock.md
-dataframes/SL&TH/daily_headline_polarity.md
-dataframes/SL&TH/openai_label_proportions.md
-dataframes/SL&TH/portfolio_returns.md
-dataframes/SL&TH/ravenpack.md
-dataframes/SL&TH/table1_full_sample.md
-dataframes/SL&TH/table1_paper_sample.md
+dataframes/SLTH/crsp_daily_stock.md
+dataframes/SLTH/daily_headline_polarity.md
+dataframes/SLTH/openai_label_proportions.md
+dataframes/SLTH/portfolio_returns.md
+dataframes/SLTH/ravenpack.md
+dataframes/SLTH/table1_full_sample.md
+dataframes/SLTH/table1_paper_sample.md
 ```
 
 
@@ -48,14 +48,14 @@ apidocs/index
 ## Pipeline Specs
 | Pipeline Name                   | ChatGPT Price Forecasting                       |
 |---------------------------------|--------------------------------------------------------|
-| Pipeline ID                     | [SL&TH](./index.md)              |
-| Lead Pipeline Developer         | Tom & Sophie             |
-| Contributors                    | Sophie Lara & Tom Hillenbrand           |
+| Pipeline ID                     | [SLTH](./index.md)              |
+| Lead Pipeline Developer         | Tom and Sophie             |
+| Contributors                    | Sophie Lara and Tom Hillenbrand           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
 | Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-03-15 20:19:58           |
+| Date of Last Code Update        | 2026-03-15 20:29:03           |
 | OS Compatibility                |  |
-| Linked Dataframes               |  [SL&TH:ravenpack](./dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](./dataframes/SL&TH/crsp_daily_stock.md)<br>  [SL&TH:daily_headline_polarity](./dataframes/SL&TH/daily_headline_polarity.md)<br>  [SL&TH:portfolio_returns](./dataframes/SL&TH/portfolio_returns.md)<br>  [SL&TH:table1_paper_sample](./dataframes/SL&TH/table1_paper_sample.md)<br>  [SL&TH:table1_full_sample](./dataframes/SL&TH/table1_full_sample.md)<br>  [SL&TH:openai_label_proportions](./dataframes/SL&TH/openai_label_proportions.md)<br>  |
+| Linked Dataframes               |  [SLTH:ravenpack](./dataframes/SLTH/ravenpack.md)<br>  [SLTH:crsp_daily_stock](./dataframes/SLTH/crsp_daily_stock.md)<br>  [SLTH:daily_headline_polarity](./dataframes/SLTH/daily_headline_polarity.md)<br>  [SLTH:portfolio_returns](./dataframes/SLTH/portfolio_returns.md)<br>  [SLTH:table1_paper_sample](./dataframes/SLTH/table1_paper_sample.md)<br>  [SLTH:table1_full_sample](./dataframes/SLTH/table1_full_sample.md)<br>  [SLTH:openai_label_proportions](./dataframes/SLTH/openai_label_proportions.md)<br>  |
 
 
 
