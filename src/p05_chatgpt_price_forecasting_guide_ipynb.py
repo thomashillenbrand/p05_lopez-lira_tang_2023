@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# %% [markdown]
 # # Replicate ChatGPT Price Forecasting
 #
 # This notebook gives a concise, reader-friendly tour of the project workflow and the core outputs used in the replication.
@@ -28,10 +29,7 @@
 #
 # The code imports project settings from `settings.py`, builds the canonical file map, and prints an existence table so we can verify which stages of the pipeline have already been run.
 
-# In[ ]:
-
-
-import json
+# %%
 from pathlib import Path
 
 import pandas as pd
@@ -66,6 +64,7 @@ pd.DataFrame(
 )
 
 
+# %% [markdown]
 # ## Step 1. Load Cleaned RavenPack and CRSP
 #
 # In order to replicate the results in this paper, we need market data from CRSP and news data from RavenPack. We are ignoring intraday data. Additionally, we use the RPA Entity Mapping File (wrds_rpa_company_mappings) in order to facilitate the mapping of RavenPack entities to company tickers.
@@ -96,19 +95,9 @@ pd.DataFrame(
 #
 # The `clean_ravenpack` process was designed to replicate the data cleaning procedure described in the paper. This includes filtering RavenPack data to match CRSP tickers, ensure a baseline relevancy rating of 0.60, deduplicating firm-day headlines using Optimal String Alignment (OSA) similarity, and aligning headline timestamps to Eastern Time. Intraday headlines are excluded, and overnight headlines are adjusted to ensure proper alignment with trading day per teh overnight cutoff at 4:00PM ET. This step ensures that the cleaned dataset is consistent with the methodology outlined in the paper.
 
-# In[ ]:
-
-
-rp = (
-    pd.read_parquet(paths["RavenPack Clean"])
-    if paths["RavenPack Clean"].exists()
-    else pd.DataFrame()
-)
-crsp = (
-    pd.read_parquet(paths["CRSP Stock Data"])
-    if paths["CRSP Stock Data"].exists()
-    else pd.DataFrame()
-)
+# %%
+rp = pd.read_parquet(paths["RavenPack Clean"]) if paths["RavenPack Clean"].exists() else pd.DataFrame()
+crsp = pd.read_parquet(paths["CRSP Stock Data"]) if paths["CRSP Stock Data"].exists() else pd.DataFrame()
 
 print("RavenPack cleaned shape:", rp.shape)
 print("CRSP Stock Data shape:", crsp.shape)
@@ -118,17 +107,17 @@ display(crsp.head(3))
 del crsp
 
 
+# %% [markdown]
 # ### Headline Timing Diagnostics
 
-# In[ ]:
-
-
+# %%
 stats, table = get_rp_timing_stats(rp)
 
 display(stats.style)
 display(table.style)
 
 
+# %% [markdown]
 # ## Step 3. Generate Batched Requests (Single-Row Example)
 #
 # **Pipeline step that generated this data**
@@ -139,22 +128,16 @@ display(table.style)
 #
 # In order to retrieve OpenAI responses to our headline prompts, we must create batch files for asynchornous submission. The RavenPack data is broken up into chunks (40,000 being the default) and each request is a single line of json (referred to as JSONL). We also create a separate mapping file for ease of processing later on.
 
-# In[ ]:
-
-
+# %%
 jsonl_content, mapping_content = generate_single_request_jsonl(rp.head(1).copy())
 
 
-# In[ ]:
-
-
+# %%
 print("JSONL content inline:")
 display(jsonl_content)
 
 
-# In[ ]:
-
-
+# %%
 print("JSONL content formatted:")
 print(
     json.dumps(
@@ -163,9 +146,7 @@ print(
 )
 
 
-# In[ ]:
-
-
+# %%
 print("ID to Row Mapping:")
 print(
     json.dumps(
@@ -174,6 +155,7 @@ print(
 )
 
 
+# %% [markdown]
 # ## Step 4. Submit Headlines to OpenAI Batch API
 #
 # **Pipeline step that generated this data**
@@ -189,15 +171,12 @@ print(
 #
 # Below is a success response from OpenAI.
 
-# In[ ]:
+# %%
+data = pd.read_json(DATA_DIR / "openai_headline_batch_output.1.jsonl", lines=True).head(1)
+display(data.iloc[0]['response'])
 
 
-data = pd.read_json(DATA_DIR / "openai_headline_batch_output.1.jsonl", lines=True).head(
-    1
-)
-display(data.iloc[0]["response"])
-
-
+# %% [markdown]
 # ## Step 5. Firm-Day Sentiment Output
 #
 # The next step in our pipeline processes the OpenAI responses, and aggregates the model's rating of each headline.
@@ -207,22 +186,14 @@ display(data.iloc[0]["response"])
 #
 # We parse each response, and if the answer for a headline was `YES` it gets a score of 1, `NO` gets a score of -1, and `UNKNOWN` gets a score of 0. We group the data set by date and ticker, and aggregate the total headlines, total score sum, and overall polarity (positive or negative). The results are written to `DATA_DIR` as `daily_headline_polarity.parquet`
 
-# In[ ]:
-
-
+# %%
 import create_firmday_score as cfs
 
 cfs.main()
 
 
-# In[ ]:
-
-
-scores = (
-    pd.read_parquet(paths["Daily Headline Scores"])
-    if paths["Daily Headline Scores"].exists()
-    else pd.DataFrame()
-)
+# %%
+scores = pd.read_parquet(paths["Daily Headline Scores"]) if paths["Daily Headline Scores"].exists() else pd.DataFrame()
 print("Scores shape:", scores.shape)
 display(scores.head(5).style)
 
@@ -239,6 +210,7 @@ if not scores.empty:
     display(summary.style)
 
 
+# %% [markdown]
 # ## Step 6. Portfolio Returns
 #
 # **Pipeline step that generated this data**
@@ -255,18 +227,13 @@ if not scores.empty:
 # - **Not Small**: market capitalization above the 20th percentile
 # - **Price > 5**: close price greater than $5 on previous day
 
-# In[ ]:
-
-
-port = (
-    pd.read_parquet(paths["Portfolio Returns"])
-    if paths["Portfolio Returns"].exists()
-    else pd.DataFrame()
-)
+# %%
+port = pd.read_parquet(paths["Portfolio Returns"]) if paths["Portfolio Returns"].exists() else pd.DataFrame()
 print("Portfolio returns:", port.shape)
 display(port.head(5).style)
 
 
+# %% [markdown]
 # ## Step 7: Generate Table 1
 #
 # **Pipeline step that generated this data**
@@ -275,47 +242,28 @@ display(port.head(5).style)
 #
 # Once we have our portfolios constructed we can attempt to replicate Table 1 from the paper. Additionally, we will generate a version of the table that includes data through January 2026. The source of the portfolio data is `portfolio_daily_returns.parquet` as described above.
 
-# In[ ]:
-
-
+# %%
 import create_table1 as ct1
 
 ct1.main()
 
 
-# In[ ]:
-
-
-full_sample_table = (
-    pd.read_csv(paths["Table1 (Oct 2021 - March 2026)"])
-    if paths["Table1 (Oct 2021 - March 2026)"].exists()
-    else pd.DataFrame()
-)
-paper_sample_table = (
-    pd.read_csv(paths["Table1 (Oct 2021 - May 2024)"])
-    if paths["Table1 (Oct 2021 - May 2024)"].exists()
-    else pd.DataFrame()
-)
+# %%
+full_sample_table = pd.read_csv(paths["Table1 (Oct 2021 - March 2026)"]) if paths["Table1 (Oct 2021 - March 2026)"].exists() else pd.DataFrame()
+paper_sample_table = pd.read_csv(paths["Table1 (Oct 2021 - May 2024)"]) if paths["Table1 (Oct 2021 - May 2024)"].exists() else pd.DataFrame()
 display(printable_table(full_sample_table.head(5), "Full Sample").style)
 display(printable_table(paper_sample_table.head(5), "Paper Sample Replication").style)
 
 
+# %% [markdown]
 # ### Replication Comparison
 
-# In[ ]:
-
-
-actual_paper_table = (
-    pd.read_csv(paths["Paper Table Data"])
-    if paths["Paper Table Data"].exists()
-    else pd.DataFrame()
-)
+# %%
+actual_paper_table = pd.read_csv(paths["Paper Table Data"]) if paths["Paper Table Data"].exists() else pd.DataFrame()
 display(printable_table(actual_paper_table, "Actual Paper Table").style)
 
 
-# In[ ]:
-
-
+# %%
 actual = actual_paper_table
 
 compare_cols = [col for col in paper_sample_table.columns if col in actual.columns]
@@ -356,6 +304,7 @@ display(
 )
 
 
+# %% [markdown]
 # ### Comparison Discussion
 #
 # As we can see from the above, some of our replication was fairly consistent with the papers results, specifically Initial Reaction Hit Rate of the Long-Short and Long-Only portfolios as well as the Drift Hit Rate of the Short-Only portfolio. Unfortuantely, everything else was substantially different.
@@ -364,9 +313,7 @@ display(
 #
 # Specifically, we note that our responses from OpenAI using the older model produced significantly more `UNKNOWN` responses than the papers model, i.e. ~67% vs 34.7%
 
-# In[ ]:
-
-
+# %%
 import create_openai_responses_table as cort
 
 cort.main()
