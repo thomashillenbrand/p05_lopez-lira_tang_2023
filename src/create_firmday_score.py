@@ -26,8 +26,8 @@ from pathlib import Path
 from typing import Iterable
 
 import pandas as pd
-from settings import config
 
+from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
 OUTPUT_DIR = Path(config("OUTPUT_DIR"))
@@ -80,7 +80,9 @@ def label_to_score(label: str | None) -> int:
 def load_outputs() -> pd.DataFrame:
     paths = sorted(DATA_DIR.glob("openai_headline_batch_output*.jsonl"))
     if not paths:
-        raise FileNotFoundError(f"No outputs found in {DATA_DIR} matching openai_headline_batch_output*.jsonl")
+        raise FileNotFoundError(
+            f"No outputs found in {DATA_DIR} matching openai_headline_batch_output*.jsonl"
+        )
 
     rows = []
     empty_choices = empty_content = unparseable = 0
@@ -101,7 +103,9 @@ def load_outputs() -> pd.DataFrame:
             if label is None:
                 unparseable += 1
                 continue
-            rows.append({"custom_id": cid, "label": label, "score": label_to_score(label)})
+            rows.append(
+                {"custom_id": cid, "label": label, "score": label_to_score(label)}
+            )
 
     df = pd.DataFrame(rows).drop_duplicates("custom_id")
     if df.empty:
@@ -109,14 +113,18 @@ def load_outputs() -> pd.DataFrame:
 
     print(f"[CHECK] outputs parsed unique custom_id: {len(df):,}")
     if empty_choices or empty_content or unparseable:
-        print(f"[CHECK] outputs skipped: empty_choices={empty_choices:,}, empty_content={empty_content:,}, unparseable={unparseable:,}")
+        print(
+            f"[CHECK] outputs skipped: empty_choices={empty_choices:,}, empty_content={empty_content:,}, unparseable={unparseable:,}"
+        )
     return df
 
 
 def load_mapping() -> pd.DataFrame:
     paths = sorted(DATA_DIR.glob("id_to_row_mapping*.json"))
     if not paths:
-        raise FileNotFoundError(f"No mapping files found in {DATA_DIR} matching id_to_row_mapping*.json")
+        raise FileNotFoundError(
+            f"No mapping files found in {DATA_DIR} matching id_to_row_mapping*.json"
+        )
 
     frames = []
     for p in paths:
@@ -148,11 +156,15 @@ def load_trading_days() -> pd.DatetimeIndex:
     if len(idx) == 0:
         raise ValueError("CRSP trading calendar is empty after parsing.")
 
-    print(f"[CHECK] trading days in CRSP calendar: {len(idx):,} (min={idx.min().date()}, max={idx.max().date()})")
+    print(
+        f"[CHECK] trading days in CRSP calendar: {len(idx):,} (min={idx.min().date()}, max={idx.max().date()})"
+    )
     return idx
 
 
-def next_td(trading_days: pd.DatetimeIndex, day: pd.Timestamp, strict: bool) -> pd.Timestamp:
+def next_td(
+    trading_days: pd.DatetimeIndex, day: pd.Timestamp, strict: bool
+) -> pd.Timestamp:
     day = pd.Timestamp(day).normalize()
     pos = trading_days.searchsorted(day, side=("right" if strict else "left"))
     return trading_days[pos] if pos < len(trading_days) else pd.NaT
@@ -163,13 +175,15 @@ def compute_trade_date(trading_days: pd.DatetimeIndex, dates: pd.Series) -> pd.S
     result = dates.copy()
     mask = ~is_td
     if mask.any():
-        result.loc[mask] = [next_td(trading_days, d, strict=False) for d in dates.loc[mask]]
+        result.loc[mask] = [
+            next_td(trading_days, d, strict=False) for d in dates.loc[mask]
+        ]
     return result
 
 
 def main():
-    outputs = load_outputs()    # custom_id,label,score
-    mapping = load_mapping()    # custom_id,ticker,entity_name,date (calendar)
+    outputs = load_outputs()  # custom_id,label,score
+    mapping = load_mapping()  # custom_id,ticker,entity_name,date (calendar)
 
     # Merge coverage checks
     scored = outputs.merge(mapping, on="custom_id", how="left", indicator=True)
@@ -179,14 +193,18 @@ def main():
 
     before_drop = len(scored)
     scored = scored.dropna(subset=["ticker", "entity_name", "date"])
-    print(f"[CHECK] rows after dropping missing ticker/entity/date/headline: {len(scored):,} (dropped {before_drop-len(scored):,})")
+    print(
+        f"[CHECK] rows after dropping missing ticker/entity/date/headline: {len(scored):,} (dropped {before_drop - len(scored):,})"
+    )
 
     trading_days = load_trading_days()
 
     scored["trade_date"] = compute_trade_date(trading_days, scored["date"])
     before_td = len(scored)
     scored = scored.dropna(subset=["trade_date"])
-    print(f"[CHECK] rows after dropping missing trade_date: {len(scored):,} (dropped {before_td-len(scored):,})")
+    print(
+        f"[CHECK] rows after dropping missing trade_date: {len(scored):,} (dropped {before_td - len(scored):,})"
+    )
     scored["date"] = pd.to_datetime(scored["trade_date"]).dt.date
 
     # Aggregate to firm-day (ticker, trade_date)
@@ -196,11 +214,15 @@ def main():
         .sort_values(["ticker", "date"])
         .reset_index(drop=True)
     )
-    daily["score"] = daily["score_sum"].apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
+    daily["score"] = daily["score_sum"].apply(
+        lambda x: 1 if x > 0 else (-1 if x < 0 else 0)
+    )
 
     print(f"[CHECK] final firm-day rows: {len(daily):,}")
     if len(daily) > 0:
-        print(f"[CHECK] firm-day date range: {daily['date'].min()} → {daily['date'].max()}")
+        print(
+            f"[CHECK] firm-day date range: {daily['date'].min()} → {daily['date'].max()}"
+        )
         # how many unique dates?
         print(f"[CHECK] unique trading dates in firm-day: {daily['date'].nunique():,}")
 

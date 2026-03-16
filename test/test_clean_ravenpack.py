@@ -14,7 +14,9 @@ def test_norm_ticker_series_normalizes_and_handles_missing_markers():
 
     result = cr._norm_ticker_series(s)
 
-    expected = pd.Series(["AAPL", "MSFT", pd.NA, pd.NA, pd.NA, pd.NA, pd.NA], dtype="object")
+    expected = pd.Series(
+        ["AAPL", "MSFT", pd.NA, pd.NA, pd.NA, pd.NA, pd.NA], dtype="object"
+    )
     pd.testing.assert_series_equal(result, expected)
 
 
@@ -27,8 +29,17 @@ def test_osa_dedupe_firm_day_drops_near_duplicates():
     g = pd.DataFrame(
         {
             "rp_entity_id": ["E1", "E1", "E1", "E1"],
-            "rpa_date_utc": pd.to_datetime(["2025-01-02", "2025-01-02", "2025-01-02", "2025-01-02"]),
-            "timestamp_utc": pd.to_datetime(["2025-01-02 08:00:00", "2025-01-02 08:05:00", "2025-01-02 08:06:00", "2025-01-02 08:10:00"]),
+            "rpa_date_utc": pd.to_datetime(
+                ["2025-01-02", "2025-01-02", "2025-01-02", "2025-01-02"]
+            ),
+            "timestamp_utc": pd.to_datetime(
+                [
+                    "2025-01-02 08:00:00",
+                    "2025-01-02 08:05:00",
+                    "2025-01-02 08:06:00",
+                    "2025-01-02 08:10:00",
+                ]
+            ),
             "headline": [
                 "Apple posts record earnings",
                 "Apple posts record earnings",
@@ -267,7 +278,9 @@ def test_main_filters_dedupes_applies_timing_and_writes_output(tmp_path, monkeyp
                     "2025-01-02 21:30:00+00:00",  # 16:30 ET -> kept, headline_date +1 day
                 ]
             ),
-            "rpa_date_utc": pd.to_datetime(["2025-01-02", "2025-01-02", "2025-01-02", "2025-01-02"]),
+            "rpa_date_utc": pd.to_datetime(
+                ["2025-01-02", "2025-01-02", "2025-01-02", "2025-01-02"]
+            ),
             "headline": [
                 "Apple beats earnings",
                 "Apple beats earnings",

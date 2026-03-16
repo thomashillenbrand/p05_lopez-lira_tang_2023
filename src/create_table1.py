@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
@@ -40,7 +41,9 @@ def mean_pct(x: pd.Series) -> float:
     return x.mean() * 100.0
 
 
-def summarize_portfolio(df: pd.DataFrame, label: str, ir_col: str, drift_col: str, trade_col: str) -> dict:
+def summarize_portfolio(
+    df: pd.DataFrame, label: str, ir_col: str, drift_col: str, trade_col: str
+) -> dict:
     traded = df[df[trade_col].fillna(False)].copy()
 
     return {
@@ -57,9 +60,15 @@ def summarize_portfolio(df: pd.DataFrame, label: str, ir_col: str, drift_col: st
 
 def build_table(df: pd.DataFrame) -> pd.DataFrame:
     rows = [
-        summarize_portfolio(df, "Long-Short Portfolio", "ret_ir_ls", "ret_ls", "trade_ls"),
-        summarize_portfolio(df, "Long-Only Portfolio", "ret_ir_long", "ret_long", "trade_long"),
-        summarize_portfolio(df, "Short-Only Portfolio", "ret_ir_short", "ret_short", "trade_short"),
+        summarize_portfolio(
+            df, "Long-Short Portfolio", "ret_ir_ls", "ret_ls", "trade_ls"
+        ),
+        summarize_portfolio(
+            df, "Long-Only Portfolio", "ret_ir_long", "ret_long", "trade_long"
+        ),
+        summarize_portfolio(
+            df, "Short-Only Portfolio", "ret_ir_short", "ret_short", "trade_short"
+        ),
     ]
 
     out = pd.DataFrame(rows)
@@ -93,7 +102,9 @@ def build_table(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def filter_window(df: pd.DataFrame, start: pd.Timestamp | None, end: pd.Timestamp | None) -> pd.DataFrame:
+def filter_window(
+    df: pd.DataFrame, start: pd.Timestamp | None, end: pd.Timestamp | None
+) -> pd.DataFrame:
     out = df.copy()
     if start is not None:
         out = out[out["date"] >= start]
@@ -107,9 +118,15 @@ def main():
     need = {
         "date",
         "n_total",
-        "ret_ir_ls", "ret_ls", "trade_ls",
-        "ret_ir_long", "ret_long", "trade_long",
-        "ret_ir_short", "ret_short", "trade_short",
+        "ret_ir_ls",
+        "ret_ls",
+        "trade_ls",
+        "ret_ir_long",
+        "ret_long",
+        "trade_long",
+        "ret_ir_short",
+        "ret_short",
+        "trade_short",
     }
     if not need.issubset(df.columns):
         raise KeyError(f"{PORT_PATH.name} must include {need}, got {set(df.columns)}")

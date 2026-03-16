@@ -49,7 +49,9 @@ def test_main_raises_when_signal_columns_missing(monkeypatch):
 
 def test_main_raises_when_crsp_columns_missing(monkeypatch):
     sig = pd.DataFrame({"ticker": ["AAA"], "date": ["2024-01-02"], "score": [1]})
-    bad_crsp = pd.DataFrame({"ticker": ["AAA"], "date": ["2024-01-02"], "dlyopen": [10.0]})
+    bad_crsp = pd.DataFrame(
+        {"ticker": ["AAA"], "date": ["2024-01-02"], "dlyopen": [10.0]}
+    )
 
     def fake_read_parquet(path):
         if path == cp.SCORES_PATH:
@@ -173,21 +175,41 @@ def test_main_builds_expected_trade_logic_and_writes_output(monkeypatch, tmp_pat
     # Signal counts
     assert row_long["n_pos"] == 2 and row_long["n_neg"] == 0 and row_long["n_neu"] == 0
     assert row_both["n_pos"] == 2 and row_both["n_neg"] == 2 and row_both["n_neu"] == 0
-    assert row_short["n_pos"] == 0 and row_short["n_neg"] == 1 and row_short["n_neu"] == 0
-    assert row_neutral["n_pos"] == 0 and row_neutral["n_neg"] == 0 and row_neutral["n_neu"] == 1
+    assert (
+        row_short["n_pos"] == 0 and row_short["n_neg"] == 1 and row_short["n_neu"] == 0
+    )
+    assert (
+        row_neutral["n_pos"] == 0
+        and row_neutral["n_neg"] == 0
+        and row_neutral["n_neu"] == 1
+    )
 
     # Trade flags from Table 1 logic
-    assert row_long["trade_long"] and not row_long["trade_short"] and row_long["trade_ls"]
+    assert (
+        row_long["trade_long"] and not row_long["trade_short"] and row_long["trade_ls"]
+    )
     assert row_both["trade_long"] and row_both["trade_short"] and row_both["trade_ls"]
-    assert (not row_short["trade_long"]) and row_short["trade_short"] and row_short["trade_ls"]
-    assert (not row_neutral["trade_long"]) and (not row_neutral["trade_short"]) and (not row_neutral["trade_ls"])
+    assert (
+        (not row_short["trade_long"])
+        and row_short["trade_short"]
+        and row_short["trade_ls"]
+    )
+    assert (
+        (not row_neutral["trade_long"])
+        and (not row_neutral["trade_short"])
+        and (not row_neutral["trade_ls"])
+    )
 
     # LS return composition rules
     assert row_long["ret_ls"] == pytest.approx(row_long["ret_long"])
     assert row_long["ret_ir_ls"] == pytest.approx(row_long["ret_ir_long"])
 
-    assert row_both["ret_ls"] == pytest.approx(row_both["ret_long"] + row_both["ret_short"])
-    assert row_both["ret_ir_ls"] == pytest.approx(row_both["ret_ir_long"] + row_both["ret_ir_short"])
+    assert row_both["ret_ls"] == pytest.approx(
+        row_both["ret_long"] + row_both["ret_short"]
+    )
+    assert row_both["ret_ir_ls"] == pytest.approx(
+        row_both["ret_ir_long"] + row_both["ret_ir_short"]
+    )
 
     assert row_short["ret_ls"] == pytest.approx(row_short["ret_short"])
     assert row_short["ret_ir_ls"] == pytest.approx(row_short["ret_ir_short"])

@@ -21,7 +21,9 @@ def test_get_input_path_raises_when_missing(tmp_path, monkeypatch):
     candidate = tmp_path / "RAVENPACK_cleaned.parquet"
     monkeypatch.setattr(gbr, "INPUT_CANDIDATE", candidate)
 
-    with pytest.raises(FileNotFoundError, match="Could not find cleaned RavenPack parquet"):
+    with pytest.raises(
+        FileNotFoundError, match="Could not find cleaned RavenPack parquet"
+    ):
         gbr.get_input_path()
 
 
@@ -166,5 +168,7 @@ def test_main_raises_when_batch_size_exceeds_limit(monkeypatch):
     monkeypatch.setattr(gbr, "OPENAI_MODEL", "gpt-test-model")
     monkeypatch.setattr(gbr, "OPENAI_BATCH_SIZE", gbr.MAX_BATCH_SIZE + 1)
 
-    with pytest.raises(EnvironmentError, match="exceeds the maximum allowed batch size"):
+    with pytest.raises(
+        EnvironmentError, match="exceeds the maximum allowed batch size"
+    ):
         gbr.main()

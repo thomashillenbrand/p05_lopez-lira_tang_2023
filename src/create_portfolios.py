@@ -3,12 +3,17 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
+
 from settings import config
 
 DATA_DIR = Path(config("DATA_DIR"))
 
-SCORES_PATH = DATA_DIR / "daily_headline_polarity.parquet"   # ticker, date, n_headlines, score_sum, score ∈ {-1,0,1}
-CRSP_PATH = DATA_DIR / "CRSP_stock_daily.parquet"            # needs: ticker,dlycaldt,dlyopen,dlyclose
+SCORES_PATH = (
+    DATA_DIR / "daily_headline_polarity.parquet"
+)  # ticker, date, n_headlines, score_sum, score ∈ {-1,0,1}
+CRSP_PATH = (
+    DATA_DIR / "CRSP_stock_daily.parquet"
+)  # needs: ticker,dlycaldt,dlyopen,dlyclose
 OUT_PATH = DATA_DIR / "portfolio_daily_returns.parquet"
 
 
@@ -36,7 +41,9 @@ def main():
     sig = pd.read_parquet(SCORES_PATH)
     need_sig = {"ticker", "date", "score"}
     if not need_sig.issubset(sig.columns):
-        raise KeyError(f"{SCORES_PATH.name} must include {need_sig}, got {set(sig.columns)}")
+        raise KeyError(
+            f"{SCORES_PATH.name} must include {need_sig}, got {set(sig.columns)}"
+        )
 
     sig = sig.copy()
     sig["ticker"] = norm_ticker(sig["ticker"])
@@ -63,7 +70,9 @@ def main():
     crsp = pd.read_parquet(CRSP_PATH)
     need_crsp = {"ticker", "date", "dlyopen", "dlyclose"}
     if not need_crsp.issubset(crsp.columns):
-        raise KeyError(f"{CRSP_PATH.name} must include {need_crsp}, got {set(crsp.columns)}")
+        raise KeyError(
+            f"{CRSP_PATH.name} must include {need_crsp}, got {set(crsp.columns)}"
+        )
 
     crsp = crsp.copy()
     crsp["ticker"] = norm_ticker(crsp["ticker"])
@@ -91,9 +100,8 @@ def main():
 
     # Figure 5 restricted sample:
     # prior-day close > $5 and prior-day cap > NYSE 20th percentile
-    crsp["eligible_restricted"] = (
-        (crsp["prev_close"] > 5)
-        & (crsp["lag_cap"] > crsp["nyse_cap_p20"])
+    crsp["eligible_restricted"] = (crsp["prev_close"] > 5) & (
+        crsp["lag_cap"] > crsp["nyse_cap_p20"]
     )
 
     crsp = crsp.dropna(subset=["ret_oc", "ret_ir"])
@@ -101,16 +109,15 @@ def main():
     # ---------------------------
     # PERMNO mapping (minimal)
     # ---------------------------
-    crsp = crsp.dropna(subset=["permno", "ticker", "date", "dlyopen", "dlyclose"]).copy()
+    crsp = crsp.dropna(
+        subset=["permno", "ticker", "date", "dlyopen", "dlyclose"]
+    ).copy()
 
     # Build a (ticker, date) -> permno map from CRSP itself
     # If multiple permnos share a ticker-date, drop those ambiguous cases
-    permno_map = (
-        crsp.sort_values(["ticker","date","permno"])
-        [["ticker","date","permno"]]
-        .drop_duplicates(subset=["ticker","date"], keep="first")
-    )
-
+    permno_map = crsp.sort_values(["ticker", "date", "permno"])[
+        ["ticker", "date", "permno"]
+    ].drop_duplicates(subset=["ticker", "date"], keep="first")
 
     # Attach permno to actionable signals
     sig_tr = sig_tr.merge(permno_map, on=["ticker", "date"], how="inner")
@@ -133,24 +140,33 @@ def main():
         how="inner",
     )
 
-
     # Separate Figure 5 restrictions
     df["eligible_not_small"] = df["lag_cap"] > df["nyse_cap_p20"]
     df["eligible_price_gt_5"] = df["prev_close"] > 5
 
     # Equal-weight legs for DRIFT (open->close)
-    long_leg = df[df["score"] == 1].groupby("date", as_index=False).agg(
-        ret_long=("ret_oc", "mean"),
-        n_long=("ret_oc", "size"),
+    long_leg = (
+        df[df["score"] == 1]
+        .groupby("date", as_index=False)
+        .agg(
+            ret_long=("ret_oc", "mean"),
+            n_long=("ret_oc", "size"),
+        )
     )
-    short_leg = df[df["score"] == -1].groupby("date", as_index=False).agg(
-        ret_short_raw=("ret_oc", "mean"),
-        n_short=("ret_oc", "size"),
+    short_leg = (
+        df[df["score"] == -1]
+        .groupby("date", as_index=False)
+        .agg(
+            ret_short_raw=("ret_oc", "mean"),
+            n_short=("ret_oc", "size"),
+        )
     )
     short_leg["ret_short"] = -short_leg["ret_short_raw"]
     short_leg = short_leg.drop(columns=["ret_short_raw"])
 
-    def build_restricted_ls(series_df: pd.DataFrame, eligibility_col: str, out_col: str) -> pd.DataFrame:
+    def build_restricted_ls(
+        series_df: pd.DataFrame, eligibility_col: str, out_col: str
+    ) -> pd.DataFrame:
         """
         Minimal Figure 5 fix only:
         build restricted series as true long-short portfolios, with no
@@ -223,11 +239,19 @@ def main():
     )
 
     # Equal-weight legs for INITIAL REACTION (prev close->open)
-    ir_long_leg = df[df["score"] == 1].groupby("date", as_index=False).agg(
-        ret_ir_long=("ret_ir", "mean"),
+    ir_long_leg = (
+        df[df["score"] == 1]
+        .groupby("date", as_index=False)
+        .agg(
+            ret_ir_long=("ret_ir", "mean"),
+        )
     )
-    ir_short_leg = df[df["score"] == -1].groupby("date", as_index=False).agg(
-        ret_ir_short_raw=("ret_ir", "mean"),
+    ir_short_leg = (
+        df[df["score"] == -1]
+        .groupby("date", as_index=False)
+        .agg(
+            ret_ir_short_raw=("ret_ir", "mean"),
+        )
     )
     ir_short_leg["ret_ir_short"] = -ir_short_leg["ret_ir_short_raw"]
     ir_short_leg = ir_short_leg.drop(columns=["ret_ir_short_raw"])
@@ -274,13 +298,17 @@ def main():
 
     # LS DRIFT return: both legs if eligible; else single leg
     out["ret_ls"] = 0.0
-    out.loc[both_legs, "ret_ls"] = out.loc[both_legs, "ret_long"] + out.loc[both_legs, "ret_short"]
+    out.loc[both_legs, "ret_ls"] = (
+        out.loc[both_legs, "ret_long"] + out.loc[both_legs, "ret_short"]
+    )
     out.loc[long_only_ls, "ret_ls"] = out.loc[long_only_ls, "ret_long"]
     out.loc[short_only_ls, "ret_ls"] = out.loc[short_only_ls, "ret_short"]
 
     # LS INITIAL REACTION return: same leg rule
     out["ret_ir_ls"] = 0.0
-    out.loc[both_legs, "ret_ir_ls"] = out.loc[both_legs, "ret_ir_long"] + out.loc[both_legs, "ret_ir_short"]
+    out.loc[both_legs, "ret_ir_ls"] = (
+        out.loc[both_legs, "ret_ir_long"] + out.loc[both_legs, "ret_ir_short"]
+    )
     out.loc[long_only_ls, "ret_ir_ls"] = out.loc[long_only_ls, "ret_ir_long"]
     out.loc[short_only_ls, "ret_ir_ls"] = out.loc[short_only_ls, "ret_ir_short"]
 

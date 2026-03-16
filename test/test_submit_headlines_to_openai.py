@@ -14,7 +14,9 @@ import submit_headlines_to_openai as sho
 def test_get_request_files_returns_sorted_indexed_files(tmp_path):
     (tmp_path / "openai_headline_requests.2.jsonl").write_text("{}\n", encoding="utf-8")
     (tmp_path / "openai_headline_requests.1.jsonl").write_text("{}\n", encoding="utf-8")
-    (tmp_path / "openai_headline_requests.bad.jsonl").write_text("{}\n", encoding="utf-8")
+    (tmp_path / "openai_headline_requests.bad.jsonl").write_text(
+        "{}\n", encoding="utf-8"
+    )
 
     result = sho.get_request_files(tmp_path)
 
@@ -110,7 +112,9 @@ def test_download_file_content_handles_content_attribute_with_text(tmp_path):
 
 
 def test_main_returns_early_when_output_already_exists(tmp_path, monkeypatch):
-    (tmp_path / "openai_headline_batch_output.1.jsonl").write_text("existing\n", encoding="utf-8")
+    (tmp_path / "openai_headline_batch_output.1.jsonl").write_text(
+        "existing\n", encoding="utf-8"
+    )
 
     openai_ctor = Mock(side_effect=AssertionError("OpenAI should not be constructed"))
     monkeypatch.setattr(sho, "OpenAI", openai_ctor)
@@ -152,8 +156,12 @@ def test_main_happy_path_writes_metadata_and_downloads_files(monkeypatch, tmp_pa
     monkeypatch.setattr(sho, "OpenAI", lambda api_key: fake_client)
 
     monkeypatch.setattr(sho, "upload_batch_file", lambda client, p: "uploaded-file-1")
-    monkeypatch.setattr(sho, "create_batch_job", lambda client, input_file_id: "batch-1")
-    monkeypatch.setattr(sho, "poll_for_batch_jobs", lambda client, jobs: {1: FakeBatchData()})
+    monkeypatch.setattr(
+        sho, "create_batch_job", lambda client, input_file_id: "batch-1"
+    )
+    monkeypatch.setattr(
+        sho, "poll_for_batch_jobs", lambda client, jobs: {1: FakeBatchData()}
+    )
 
     downloaded = []
 
@@ -198,8 +206,12 @@ def test_main_raises_when_any_batch_not_completed(monkeypatch, tmp_path):
     monkeypatch.setattr(sho, "OpenAI", lambda api_key: fake_client)
 
     monkeypatch.setattr(sho, "upload_batch_file", lambda client, p: "uploaded-file-1")
-    monkeypatch.setattr(sho, "create_batch_job", lambda client, input_file_id: "batch-1")
-    monkeypatch.setattr(sho, "poll_for_batch_jobs", lambda client, jobs: {1: FailedBatchData()})
+    monkeypatch.setattr(
+        sho, "create_batch_job", lambda client, input_file_id: "batch-1"
+    )
+    monkeypatch.setattr(
+        sho, "poll_for_batch_jobs", lambda client, jobs: {1: FailedBatchData()}
+    )
 
     with pytest.raises(RuntimeError, match="did not complete successfully"):
         sho.main()

@@ -71,7 +71,9 @@ def test_create_crsp_summary_builds_two_metric_rows(monkeypatch):
 
     # Valid rows after filtering include AAA, BBB, and None->"NONE" ticker row.
     assert mc["Mean"] == pytest.approx((2.0 + 1.0 + 1.0) / 3)
-    assert dr["Mean"] == pytest.approx((((11 / 10 - 1) * 100) + ((19 / 20 - 1) * 100) + 0.0) / 3)
+    assert dr["Mean"] == pytest.approx(
+        (((11 / 10 - 1) * 100) + ((19 / 20 - 1) * 100) + 0.0) / 3
+    )
 
 
 def test_create_crsp_summary_raises_on_missing_columns(monkeypatch):
@@ -150,8 +152,25 @@ def test_create_news_by_timing_raises_on_missing_columns(monkeypatch):
 
 def test_main_writes_three_csv_outputs(monkeypatch, tmp_path):
     crsp_summary = pd.DataFrame({"Metric": ["M"], "Mean": [1.0]})
-    news_year = pd.DataFrame({"Year": [2024], "Headlines": [1], "Firms": [1], "Days": [1], "Per Day": [1.0], "Per Firm": [1.0]})
-    news_timing = pd.DataFrame({"Timing": ["Overnight"], "Headlines": [1], "% Total": [100.0], "Firms": [1], "Per Day": [1.0]})
+    news_year = pd.DataFrame(
+        {
+            "Year": [2024],
+            "Headlines": [1],
+            "Firms": [1],
+            "Days": [1],
+            "Per Day": [1.0],
+            "Per Firm": [1.0],
+        }
+    )
+    news_timing = pd.DataFrame(
+        {
+            "Timing": ["Overnight"],
+            "Headlines": [1],
+            "% Total": [100.0],
+            "Firms": [1],
+            "Per Day": [1.0],
+        }
+    )
 
     monkeypatch.setattr(css, "create_crsp_summary", lambda: crsp_summary)
     monkeypatch.setattr(css, "create_news_by_year", lambda: news_year)
