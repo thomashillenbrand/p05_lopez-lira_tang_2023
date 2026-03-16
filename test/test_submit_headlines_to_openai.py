@@ -112,7 +112,6 @@ def test_download_file_content_handles_content_attribute_with_text(tmp_path):
 def test_main_returns_early_when_output_already_exists(tmp_path, monkeypatch):
     (tmp_path / "openai_headline_batch_output.1.jsonl").write_text("existing\n", encoding="utf-8")
 
-    monkeypatch.setattr(sho, "OUTPUT_DIR", tmp_path)
     openai_ctor = Mock(side_effect=AssertionError("OpenAI should not be constructed"))
     monkeypatch.setattr(sho, "OpenAI", openai_ctor)
 
@@ -120,8 +119,8 @@ def test_main_returns_early_when_output_already_exists(tmp_path, monkeypatch):
 
 
 def test_main_raises_when_api_key_missing(monkeypatch, tmp_path):
-    monkeypatch.setattr(sho, "OUTPUT_DIR", tmp_path)
-    monkeypatch.setattr(sho, "OPENAI_API_KEY", "")
+    monkeypatch.setattr(sho, "OPENAI_API_KEY", None)
+    monkeypatch.setattr(sho, "DATA_DIR", tmp_path / "data")
 
     with pytest.raises(EnvironmentError, match="OPENAI_API_KEY is not set"):
         sho.main()
@@ -129,9 +128,7 @@ def test_main_raises_when_api_key_missing(monkeypatch, tmp_path):
 
 def test_main_happy_path_writes_metadata_and_downloads_files(monkeypatch, tmp_path):
     data_dir = tmp_path / "data"
-    output_dir = tmp_path / "output"
     data_dir.mkdir()
-    output_dir.mkdir()
 
     (data_dir / "openai_headline_requests.1.jsonl").write_text("{}\n", encoding="utf-8")
 
@@ -151,7 +148,6 @@ def test_main_happy_path_writes_metadata_and_downloads_files(monkeypatch, tmp_pa
     fake_client = Mock()
 
     monkeypatch.setattr(sho, "DATA_DIR", data_dir)
-    monkeypatch.setattr(sho, "OUTPUT_DIR", output_dir)
     monkeypatch.setattr(sho, "OPENAI_API_KEY", "test-key")
     monkeypatch.setattr(sho, "OpenAI", lambda api_key: fake_client)
 
@@ -169,7 +165,7 @@ def test_main_happy_path_writes_metadata_and_downloads_files(monkeypatch, tmp_pa
 
     sho.main()
 
-    metadata_path = output_dir / "openai_headline_batch_metadata.1.json"
+    metadata_path = data_dir / "openai_headline_batch_metadata.1.json"
     assert metadata_path.exists()
 
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -183,9 +179,7 @@ def test_main_happy_path_writes_metadata_and_downloads_files(monkeypatch, tmp_pa
 
 def test_main_raises_when_any_batch_not_completed(monkeypatch, tmp_path):
     data_dir = tmp_path / "data"
-    output_dir = tmp_path / "output"
     data_dir.mkdir()
-    output_dir.mkdir()
 
     (data_dir / "openai_headline_requests.1.jsonl").write_text("{}\n", encoding="utf-8")
 
@@ -200,7 +194,6 @@ def test_main_raises_when_any_batch_not_completed(monkeypatch, tmp_path):
     fake_client = Mock()
 
     monkeypatch.setattr(sho, "DATA_DIR", data_dir)
-    monkeypatch.setattr(sho, "OUTPUT_DIR", output_dir)
     monkeypatch.setattr(sho, "OPENAI_API_KEY", "test-key")
     monkeypatch.setattr(sho, "OpenAI", lambda api_key: fake_client)
 
