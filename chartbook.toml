@@ -24,7 +24,7 @@ README_file_path = "./README.md"
 [notebooks.p05_chatgpt_price_forecasting_guide_ipynb]
 notebook_name = "ChatGPT Price Forecasting Notebook"
 notebook_description = "Overview of the ChatGPT Price forecasting procedure and methodologies."
-notebook_path = "_output/p05_chatgpt_price_forecasting_guide_ipynb.html"
+notebook_path = "_output/p05_chatgpt_price_forecasting_guide_ipynb.ipynb"
 
 
 [dataframes]
