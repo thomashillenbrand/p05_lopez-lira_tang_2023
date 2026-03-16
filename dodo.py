@@ -340,7 +340,7 @@ def task_run_notebooks():
                 f"jupytext --to notebook --output {notebook_path} {pyfile_path}",
                 jupyter_execute_notebook(notebook_path),
                 jupyter_to_html(notebook_path),
-                mv(notebook_path, OUTPUT_DIR / "_notebook_build"),
+                mv(notebook_path, OUTPUT_DIR ),
                 """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
             ],
             "file_dep": [
@@ -349,6 +349,7 @@ def task_run_notebooks():
             ],
             "targets": [
                 OUTPUT_DIR / f"{notebook}.html",
+                OUTPUT_DIR / f"{notebook}.ipynb",
                 *notebook_tasks[notebook]["targets"],
             ],
             "clean": True,
@@ -589,9 +590,13 @@ sphinx_targets = [
 
 def task_build_chartbook_site():
     """Compile Sphinx Docs"""
+    notebook_scripts = [
+        Path(notebook_tasks[notebook]["path"]) for notebook in notebook_tasks.keys()
+    ]
     file_dep = [
         "./README.md",
         "./chartbook.toml",
+        *notebook_scripts,
     ]
 
     return {
