@@ -50,7 +50,7 @@ $ dlyclose             <f64> 153.64
 | Contributors                    | Sophie Lara and Tom Hillenbrand           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
 | Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-03-15 20:50:48           |
+| Date of Last Code Update        | 2026-03-15 21:42:08           |
 | OS Compatibility                |  |
 | Linked Dataframes               |  [SLTH:ravenpack](../dataframes/SLTH/ravenpack.md)<br>  [SLTH:crsp_daily_stock](../dataframes/SLTH/crsp_daily_stock.md)<br>  [SLTH:daily_headline_polarity](../dataframes/SLTH/daily_headline_polarity.md)<br>  [SLTH:portfolio_returns](../dataframes/SLTH/portfolio_returns.md)<br>  [SLTH:table1_paper_sample](../dataframes/SLTH/table1_paper_sample.md)<br>  [SLTH:table1_full_sample](../dataframes/SLTH/table1_full_sample.md)<br>  [SLTH:openai_label_proportions](../dataframes/SLTH/openai_label_proportions.md)<br>  |
 
