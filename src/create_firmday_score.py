@@ -78,9 +78,9 @@ def label_to_score(label: str | None) -> int:
 
 
 def load_outputs() -> pd.DataFrame:
-    paths = sorted(OUTPUT_DIR.glob("openai_headline_batch_output*.jsonl"))
+    paths = sorted(DATA_DIR.glob("openai_headline_batch_output*.jsonl"))
     if not paths:
-        raise FileNotFoundError(f"No outputs found in {OUTPUT_DIR} matching openai_headline_batch_output*.jsonl")
+        raise FileNotFoundError(f"No outputs found in {DATA_DIR} matching openai_headline_batch_output*.jsonl")
 
     rows = []
     empty_choices = empty_content = unparseable = 0

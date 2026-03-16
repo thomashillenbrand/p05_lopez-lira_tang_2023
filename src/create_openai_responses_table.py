@@ -78,10 +78,10 @@ def load_mapping() -> pd.DataFrame:
 
 
 def load_outputs() -> pd.DataFrame:
-    output_files = sorted(OUTPUT_DIR.glob("openai_headline_batch_output*.jsonl"))
+    output_files = sorted(DATA_DIR.glob("openai_headline_batch_output*.jsonl"))
     if not output_files:
         raise FileNotFoundError(
-            f"No output files found in {OUTPUT_DIR} matching openai_headline_batch_output*.jsonl"
+            f"No output files found in {DATA_DIR} matching openai_headline_batch_output*.jsonl"
         )
 
     rows = []

@@ -78,8 +78,8 @@ def test_load_mapping_raises_when_date_field_missing(tmp_path, monkeypatch):
 
 
 def test_load_outputs_parses_labels_and_deduplicates(tmp_path, monkeypatch):
-    out_dir = tmp_path / "out"
-    out_dir.mkdir()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
 
     rows = [
         {
@@ -101,11 +101,11 @@ def test_load_outputs_parses_labels_and_deduplicates(tmp_path, monkeypatch):
         {"response": {"body": {"choices": [{"message": {"content": "YES"}}]}}},
     ]
 
-    (out_dir / "openai_headline_batch_output.1.jsonl").write_text(
+    (data_dir / "openai_headline_batch_output.1.jsonl").write_text(
         "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8"
     )
 
-    monkeypatch.setattr(cort, "OUTPUT_DIR", out_dir)
+    monkeypatch.setattr(cort, "DATA_DIR", data_dir)
 
     result = cort.load_outputs().sort_values("custom_id").reset_index(drop=True)
 
@@ -114,7 +114,7 @@ def test_load_outputs_parses_labels_and_deduplicates(tmp_path, monkeypatch):
 
 
 def test_load_outputs_raises_when_no_files(tmp_path, monkeypatch):
-    monkeypatch.setattr(cort, "OUTPUT_DIR", tmp_path)
+    monkeypatch.setattr(cort, "DATA_DIR", tmp_path)
 
     with pytest.raises(FileNotFoundError, match="No output files found"):
         cort.load_outputs()

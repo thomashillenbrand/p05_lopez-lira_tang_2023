@@ -53,7 +53,7 @@ def test_load_outputs_parses_and_deduplicates(tmp_path, monkeypatch):
     ]
     output_file.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
 
-    monkeypatch.setattr(cfs, "OUTPUT_DIR", tmp_path)
+    monkeypatch.setattr(cfs, "DATA_DIR", tmp_path)
 
     result = cfs.load_outputs().sort_values("custom_id").reset_index(drop=True)
 
@@ -66,7 +66,7 @@ def test_load_outputs_parses_and_deduplicates(tmp_path, monkeypatch):
 
 
 def test_load_outputs_raises_when_no_files(tmp_path, monkeypatch):
-    monkeypatch.setattr(cfs, "OUTPUT_DIR", tmp_path)
+    monkeypatch.setattr(cfs, "DATA_DIR", tmp_path)
 
     with pytest.raises(FileNotFoundError, match="No outputs found"):
         cfs.load_outputs()
@@ -86,7 +86,7 @@ def test_load_outputs_raises_when_parsed_df_is_empty(tmp_path, monkeypatch):
     ]
     output_file.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
 
-    monkeypatch.setattr(cfs, "OUTPUT_DIR", tmp_path)
+    monkeypatch.setattr(cfs, "DATA_DIR", tmp_path)
 
     with pytest.raises(ValueError, match="Parsed 0 scored outputs"):
         cfs.load_outputs()
