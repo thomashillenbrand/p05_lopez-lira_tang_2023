@@ -30,8 +30,8 @@
 # The code imports project settings from `settings.py`, builds the canonical file map, and prints an existence table so we can verify which stages of the pipeline have already been run.
 
 # %%
+import json
 from pathlib import Path
-
 import pandas as pd
 
 from notebook_helper import (
@@ -51,8 +51,8 @@ paths = {
     "RavenPack Clean": DATA_DIR / "RAVENPACK_cleaned.parquet",
     "Daily Headline Scores": DATA_DIR / "daily_headline_polarity.parquet",
     "Portfolio Returns": DATA_DIR / "portfolio_daily_returns.parquet",
-    "Table1 (Oct 2021 - May 2024)": DATA_DIR / "table1_overnight_paper_sample.csv",
-    "Table1 (Oct 2021 - March 2026)": DATA_DIR / "table1_overnight_full_sample.csv",
+    "Table1 (Oct 2021 - May 2024)": OUTPUT_DIR / "table1_overnight_paper_sample.csv",
+    "Table1 (Oct 2021 - March 2026)": OUTPUT_DIR / "table1_overnight_full_sample.csv",
     "Paper Table Data": MANUAL_DATA_DIR / "paper_table1.csv",
 }
 

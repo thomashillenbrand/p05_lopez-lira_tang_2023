@@ -309,47 +309,6 @@ def task_process():
     }
 
 
-notebook_tasks = {
-    "p05_chatgpt_price_forecasting_guide_ipynb": {
-        "path": "./src/p05_chatgpt_price_forecasting_guide_ipynb.py",
-        "file_dep": [],
-        "targets": [],
-    },
-}
-
-
-# fmt: off
-def task_run_notebooks():
-    """Preps the notebooks for presentation format.
-    Execute notebooks if the script version of it has been changed.
-    """
-    for notebook in notebook_tasks.keys():
-        pyfile_path = Path(notebook_tasks[notebook]["path"])
-        notebook_path = pyfile_path.with_suffix(".ipynb")
-        yield {
-            "name": notebook,
-            "actions": [
-                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
-                f"jupytext --to notebook --output {notebook_path} {pyfile_path}",
-                jupyter_execute_notebook(notebook_path),
-                jupyter_to_html(notebook_path),
-                mv(notebook_path, OUTPUT_DIR ),
-                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
-            ],
-            "file_dep": [
-                pyfile_path,
-                *notebook_tasks[notebook]["file_dep"],
-            ],
-            "targets": [
-                OUTPUT_DIR / f"{notebook}.html",
-                OUTPUT_DIR / f"{notebook}.ipynb",
-                *notebook_tasks[notebook]["targets"],
-            ],
-            "clean": True,
-        }
-# fmt: on
-
-
 def task_charts():
     """Generate exploratory charts (interactive HTML)"""
 
@@ -528,6 +487,46 @@ def task_charts():
         ],
         "clean": [],
     }
+    
+notebook_tasks = {
+    "p05_chatgpt_price_forecasting_guide_ipynb": {
+        "path": "./src/p05_chatgpt_price_forecasting_guide_ipynb.py",
+        "file_dep": [],
+        "targets": [],
+    },
+}
+
+
+# fmt: off
+def task_run_notebooks():
+    """Preps the notebooks for presentation format.
+    Execute notebooks if the script version of it has been changed.
+    """
+    for notebook in notebook_tasks.keys():
+        pyfile_path = Path(notebook_tasks[notebook]["path"])
+        notebook_path = pyfile_path.with_suffix(".ipynb")
+        yield {
+            "name": notebook,
+            "actions": [
+                """python -c "import sys; from datetime import datetime; print(f'Start """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+                f"jupytext --to notebook --output {notebook_path} {pyfile_path}",
+                jupyter_execute_notebook(notebook_path),
+                jupyter_to_html(notebook_path),
+                mv(notebook_path, OUTPUT_DIR ),
+                """python -c "import sys; from datetime import datetime; print(f'End """ + notebook + """: {datetime.now()}', file=sys.stderr)" """,
+            ],
+            "file_dep": [
+                pyfile_path,
+                *notebook_tasks[notebook]["file_dep"],
+            ],
+            "targets": [
+                OUTPUT_DIR / f"{notebook}.html",
+                OUTPUT_DIR / f"{notebook}.ipynb",
+                *notebook_tasks[notebook]["targets"],
+            ],
+            "clean": True,
+        }
+# fmt: on
 
 
 ###############################################################
