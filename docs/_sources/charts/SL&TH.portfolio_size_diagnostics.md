@@ -1,32 +1,32 @@
 ---
 date: 2026-03-15 19:32:07
-tags: WRDS
+tags: CRSP, RavenPack, OpenAI
 category: 
 ---
 
-# Chart: Overnight vs Intraday RavenPack News
-Daily proportion of RavenPack headlines posted outside vs inside market hours (ET), with average lines.
+# Chart: Portfolio Size Diagnostics
+Number of stocks in the long and short portfolios through time.
 
 ## Chart
 ```{raw} html
-<iframe src="../_static/SL&TH/ravenpack_news_timing.html" height="500px" width="100%"></iframe>
+<iframe src="../_static/SL&TH/portfolio_size_diagnostics.html" height="500px" width="100%"></iframe>
 
-<p style="text-align: center;">Sources: WRDS</p>
+<p style="text-align: center;">Sources: CRSP, RavenPack, OpenAI</p>
 ```
-[Full Screen Chart](../download_chart/SL&TH/ravenpack_news_timing.html)
+[Full Screen Chart](../download_chart/SL&TH/portfolio_size_diagnostics.html)
 
 
 
 
 
-Overnight vs Intraday RavenPack News
+Daily long and short portfolio counts for the main strategy and restricted variants.
 
 
 ## Chart Specs
 
-| Chart Name             | Overnight vs Intraday RavenPack News                                             |
+| Chart Name             | Portfolio Size Diagnostics                                             |
 |------------------------|------------------------------------------------------------|
-| Chart ID               | ravenpack_news_timing                                               |
+| Chart ID               | portfolio_size_diagnostics                                               |
 | Topic Tags             |                                 |
 | Data Series Start Date |                                  |
 | Data Frequency         |                                          |
@@ -35,29 +35,33 @@ Overnight vs Intraday RavenPack News
 | Data Release Timing    |                                     |
 | Seasonal Adjustment    |                                     |
 | Units                  |                                                   |
-| HTML Chart             | [HTML](../download_chart/SL&TH/ravenpack_news_timing.html)    |
+| HTML Chart             | [HTML](../download_chart/SL&TH/portfolio_size_diagnostics.html)    |
 
 
 ## Dataframe Manifest
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [ravenpack](../dataframes/SL&TH/ravenpack.md)                                       |
-| Data Sources                   | WRDS                                        |
-| Data Providers                 | RavenPack                                      |
+| Dataframe ID                   | [portfolio_returns](../dataframes/SL&TH/portfolio_returns.md)                                       |
+| Data Sources                   | CRSP, RavenPack, OpenAI                                        |
+| Data Providers                 | WRDS, OpenAI                                      |
 | Links to Providers             |                              |
 | Topic Tags                     |                                           |
 | Type of Data Access            |                                   |
-| How is data pulled?            | src/pull_ravenpack.py                                                    |
+| How is data pulled?            | src/create_portfolios.py                                                    |
 | Data available up to (min)     |                                                              |
 | Data available up to (max)     |                                                              |
-| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/RAVENPACK.parquet                                                   |
+| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/portfolio_daily_returns.parquet                                                   |
 
 
 **Linked Charts:**
 
 
-- [SL&TH:ravenpack_news_timing](../../charts/SL&TH.ravenpack_news_timing.md)
+- [SL&TH:figure5_paper_sample](../../charts/SL&TH.figure5_paper_sample.md)
+
+- [SL&TH:figure5_full_sample](../../charts/SL&TH.figure5_full_sample.md)
+
+- [SL&TH:portfolio_size_diagnostics](../../charts/SL&TH.portfolio_size_diagnostics.md)
 
 
 

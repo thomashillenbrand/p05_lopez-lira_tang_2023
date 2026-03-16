@@ -357,21 +357,7 @@ def task_run_notebooks():
 
 
 def task_charts():
-    """HW3: Generate exploratory charts (interactive HTML)"""
-#     yield {
-#         "name": "crsp_daily_closing_prices",
-#         "actions": [
-#             "ipython ./src/settings.py",
-#             "ipython ./src/plot_CRSP_data.py",
-#         ],
-#         "targets": [OUTPUT_DIR / "crsp_daily_closing_prices.html"],
-#         "file_dep": [
-#             "./src/settings.py",
-#             "./src/plot_CRSP_data.py",
-#             DATA_DIR / "CRSP_stock_daily.parquet",
-#         ],
-#         "clean": True,
-#     }
+    """Generate exploratory charts (interactive HTML)"""
 
     yield {
         "name": "ravenpack_news_timing",
@@ -596,24 +582,24 @@ def task_compile_latex_docs():
         "clean": True,
     }
 
-# sphinx_targets = [
-#     "./docs/index.html",
-# ]
+sphinx_targets = [
+    "./docs/index.html",
+]
 
 
-# def task_build_chartbook_site():
-#     """Compile Sphinx Docs"""
-#     file_dep = [
-#         "./README.md",
-#         "./chartbook.toml",
-#     ]
+def task_build_chartbook_site():
+    """Compile Sphinx Docs"""
+    file_dep = [
+        "./README.md",
+        "./chartbook.toml",
+    ]
 
-#     return {
-#         "actions": [
-#             "chartbook build -f",
-#         ],  # Use docs as build destination
-#         "targets": sphinx_targets,
-#         "file_dep": file_dep,
-#         "task_dep": ["charts"],
-#         "clean": True,
-#     }
+    return {
+        "actions": [
+            "chartbook build -f",
+        ],  # Use docs as build destination
+        "targets": sphinx_targets,
+        "file_dep": file_dep,
+        "task_dep": ["charts"],
+        "clean": True,
+    }

@@ -2,5 +2,12 @@ Name,Metadata Complete,Object Type,Identifier,Pipeline,Missing Fields,Page Link
 ChatGPT Price Forecasting,False,pipeline,SL&TH,SL&TH,"build_commands, os_compatibility",../index.html
 ravenpack,False,dataframe,ravenpack,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/ravenpack.html
 crsp_daily_stock,False,dataframe,crsp_daily_stock,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/crsp_daily_stock.html
+daily_headline_polarity,False,dataframe,daily_headline_polarity,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/daily_headline_polarity.html
+portfolio_returns,False,dataframe,portfolio_returns,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/portfolio_returns.html
+table1_paper_sample,False,dataframe,table1_paper_sample,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/table1_paper_sample.html
+table1_full_sample,False,dataframe,table1_full_sample,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/table1_full_sample.html
+openai_label_proportions,False,dataframe,openai_label_proportions,SL&TH,"dataframe_name, short_description_df, links_to_data_providers, topic_tags",../dataframes/SL&TH/openai_label_proportions.html
 Overnight vs Intraday RavenPack News,False,chart,ravenpack_news_timing,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.ravenpack_news_timing.html
-Daily Closing Prices,False,chart,crsp_daily_stock,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.crsp_daily_stock.html
+Figure 5: Portfolio Performance (Paper Sample),False,chart,figure5_paper_sample,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.figure5_paper_sample.html
+Figure 5: Portfolio Performance (Full Sample),False,chart,figure5_full_sample,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.figure5_full_sample.html
+Portfolio Size Diagnostics,False,chart,portfolio_size_diagnostics,SL&TH,"topic_tags, data_frequency, observation_period, lag_in_data_release, data_release_timing, units",../charts/SL&TH.portfolio_size_diagnostics.html

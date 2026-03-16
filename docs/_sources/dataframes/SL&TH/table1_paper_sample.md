@@ -1,19 +1,21 @@
-# Dataframe: `SL&TH:ravenpack` - 
+# Dataframe: `SL&TH:table1_paper_sample` - 
 
-Dataframe showing Ravenpack data split out as intraday or overnight news
+Replication of Table 1 using the paper sample period from 2021-10-01 to 2024-05-31.
 
 
 ## DataFrame Glimpse
 
 ```
-Rows: 1143333
-Columns: 6
-$ rp_entity_id           <str> 'WZXP28'
-$ rpa_date_utc  <datetime[ns]> 2023-03-13 00:00:00
-$ timestamp_utc <datetime[ns]> 2023-03-13 12:30:07.068000
-$ map_ticker             <str> 'CRGO'
-$ entity_name            <str> 'Freightos Ltd.'
-$ headline               <str> 'Freightos Announces Record Fiscal Year 2022 Results'
+Rows: 4
+Columns: 8
+$ Portfolio                        <str> 'Sample Summary'
+$ Initial Reaction Hit Rate (%)    <f64> null
+$ Initial Reaction Mean Return (%) <f64> null
+$ Drift Hit Rate (%)               <f64> null
+$ Drift Mean Return (%)            <f64> null
+$ Drift Sharpe Ratio               <f64> null
+$ Trading Days                     <i64> 670
+$ Firm-Day Observations            <f64> 112092.0
 
 
 ```
@@ -22,23 +24,21 @@ $ headline               <str> 'Freightos Announces Record Fiscal Year 2022 Resu
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [ravenpack](../dataframes/SL&TH/ravenpack.md)                                       |
-| Data Sources                   | WRDS                                        |
-| Data Providers                 | RavenPack                                      |
+| Dataframe ID                   | [table1_paper_sample](../dataframes/SL&TH/table1_paper_sample.md)                                       |
+| Data Sources                   | CRSP, RavenPack, OpenAI                                        |
+| Data Providers                 | WRDS, OpenAI                                      |
 | Links to Providers             |                              |
 | Topic Tags                     |                                           |
 | Type of Data Access            |                                   |
-| How is data pulled?            | src/pull_ravenpack.py                                                    |
+| How is data pulled?            | src/create_table1.py                                                    |
 | Data available up to (min)     | None                                                             |
 | Data available up to (max)     | None                                                             |
-| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/RAVENPACK.parquet                                                   |
+| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_output/table1_overnight_paper_sample.csv                                                   |
 
 
 **Linked Charts:**
 
-
-- [SL&TH:ravenpack_news_timing](../../charts/SL&TH.ravenpack_news_timing.md)
-
+- None
 
 
 ## Pipeline Manifest

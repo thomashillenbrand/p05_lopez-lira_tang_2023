@@ -1,19 +1,18 @@
-# Dataframe: `SL&TH:ravenpack` - 
+# Dataframe: `SL&TH:openai_label_proportions` - 
 
-Dataframe showing Ravenpack data split out as intraday or overnight news
+Distribution of OpenAI headline labels across the paper sample and the full sample.
 
 
 ## DataFrame Glimpse
 
 ```
-Rows: 1143333
-Columns: 6
-$ rp_entity_id           <str> 'WZXP28'
-$ rpa_date_utc  <datetime[ns]> 2023-03-13 00:00:00
-$ timestamp_utc <datetime[ns]> 2023-03-13 12:30:07.068000
-$ map_ticker             <str> 'CRGO'
-$ entity_name            <str> 'Freightos Ltd.'
-$ headline               <str> 'Freightos Announces Record Fiscal Year 2022 Results'
+Rows: 3
+Columns: 5
+$ label                              <str> 'UNKNOWN'
+$ proportion_2021_2024_sample_period <f64> 0.6719238780388449
+$ proportion_full_sample             <f64> 0.6654236803204425
+$ count_2021_2024_sample_period      <i64> 87422
+$ count_full_sample                  <i64> 139546
 
 
 ```
@@ -22,23 +21,21 @@ $ headline               <str> 'Freightos Announces Record Fiscal Year 2022 Resu
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [ravenpack](../dataframes/SL&TH/ravenpack.md)                                       |
-| Data Sources                   | WRDS                                        |
-| Data Providers                 | RavenPack                                      |
+| Dataframe ID                   | [openai_label_proportions](../dataframes/SL&TH/openai_label_proportions.md)                                       |
+| Data Sources                   | RavenPack, OpenAI                                        |
+| Data Providers                 | RavenPack, OpenAI                                      |
 | Links to Providers             |                              |
 | Topic Tags                     |                                           |
 | Type of Data Access            |                                   |
-| How is data pulled?            | src/pull_ravenpack.py                                                    |
+| How is data pulled?            | src/create_openai_responses_table.py                                                    |
 | Data available up to (min)     | None                                                             |
 | Data available up to (max)     | None                                                             |
-| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/RAVENPACK.parquet                                                   |
+| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_output/openai_output_label_proportions.csv                                                   |
 
 
 **Linked Charts:**
 
-
-- [SL&TH:ravenpack_news_timing](../../charts/SL&TH.ravenpack_news_timing.md)
-
+- None
 
 
 ## Pipeline Manifest
