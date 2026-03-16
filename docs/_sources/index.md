@@ -28,7 +28,12 @@ charts.md
 :maxdepth: 1
 :caption: Pipeline Dataframes 📊
 dataframes/SL&TH/crsp_daily_stock.md
+dataframes/SL&TH/daily_headline_polarity.md
+dataframes/SL&TH/openai_label_proportions.md
+dataframes/SL&TH/portfolio_returns.md
 dataframes/SL&TH/ravenpack.md
+dataframes/SL&TH/table1_full_sample.md
+dataframes/SL&TH/table1_paper_sample.md
 ```
 
 
@@ -47,10 +52,10 @@ apidocs/index
 | Lead Pipeline Developer         | Tom&Sophie             |
 | Contributors                    | Tom&Sophie           |
 | Git Repo URL                    | github.com/thomashillenbrand/p05_lopez-lira_tang_2023                        |
-| Pipeline Web Page               | <a href="file:///home/tomhillenbrand/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
-| Date of Last Code Update        | 2026-02-10 19:39:21           |
+| Pipeline Web Page               | <a href="file:///home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/docs/index.html">Pipeline Web Page      |
+| Date of Last Code Update        | 2026-03-15 19:13:18           |
 | OS Compatibility                |  |
-| Linked Dataframes               |  [SL&TH:ravenpack](./dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](./dataframes/SL&TH/crsp_daily_stock.md)<br>  |
+| Linked Dataframes               |  [SL&TH:ravenpack](./dataframes/SL&TH/ravenpack.md)<br>  [SL&TH:crsp_daily_stock](./dataframes/SL&TH/crsp_daily_stock.md)<br>  [SL&TH:daily_headline_polarity](./dataframes/SL&TH/daily_headline_polarity.md)<br>  [SL&TH:portfolio_returns](./dataframes/SL&TH/portfolio_returns.md)<br>  [SL&TH:table1_paper_sample](./dataframes/SL&TH/table1_paper_sample.md)<br>  [SL&TH:table1_full_sample](./dataframes/SL&TH/table1_full_sample.md)<br>  [SL&TH:openai_label_proportions](./dataframes/SL&TH/openai_label_proportions.md)<br>  |
 
 
 

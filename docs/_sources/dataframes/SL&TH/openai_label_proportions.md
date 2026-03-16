@@ -1,21 +1,18 @@
-# Dataframe: `SL&TH:crsp_daily_stock` - 
+# Dataframe: `SL&TH:openai_label_proportions` - 
 
-This dataframe contains daily stock data from CRSP, including closing prices and other relevant fields.
+Distribution of OpenAI headline labels across the paper sample and the full sample.
 
 
 ## DataFrame Glimpse
 
 ```
-Rows: 7467730
-Columns: 8
-$ permno               <i64> 10026
-$ permco               <i64> 7976
-$ ticker               <str> 'JJSF'
-$ primaryexch          <str> 'Q'
-$ date        <datetime[ns]> 2021-10-01 00:00:00
-$ dlycap               <f64> 2932065.76
-$ dlyopen              <f64> 153.85
-$ dlyclose             <f64> 153.64
+Rows: 3
+Columns: 5
+$ label                              <str> 'UNKNOWN'
+$ proportion_2021_2024_sample_period <f64> 0.6719238780388449
+$ proportion_full_sample             <f64> 0.6654236803204425
+$ count_2021_2024_sample_period      <i64> 87422
+$ count_full_sample                  <i64> 139546
 
 
 ```
@@ -24,16 +21,16 @@ $ dlyclose             <f64> 153.64
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)                                       |
-| Data Sources                   | WRDS                                        |
-| Data Providers                 | CRSP                                      |
+| Dataframe ID                   | [openai_label_proportions](../dataframes/SL&TH/openai_label_proportions.md)                                       |
+| Data Sources                   | RavenPack, OpenAI                                        |
+| Data Providers                 | RavenPack, OpenAI                                      |
 | Links to Providers             |                              |
 | Topic Tags                     |                                           |
 | Type of Data Access            |                                   |
-| How is data pulled?            | src/pull_CRSP_stock.py                                                    |
-| Data available up to (min)     | N/A (large file)                                                             |
-| Data available up to (max)     | N/A (large file)                                                             |
-| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/CRSP_stock_daily.parquet                                                   |
+| How is data pulled?            | src/create_openai_responses_table.py                                                    |
+| Data available up to (min)     | None                                                             |
+| Data available up to (max)     | None                                                             |
+| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_output/openai_output_label_proportions.csv                                                   |
 
 
 **Linked Charts:**

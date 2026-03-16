@@ -1,21 +1,21 @@
-# Dataframe: `SL&TH:crsp_daily_stock` - 
+# Dataframe: `SL&TH:table1_paper_sample` - 
 
-This dataframe contains daily stock data from CRSP, including closing prices and other relevant fields.
+Replication of Table 1 using the paper sample period from 2021-10-01 to 2024-05-31.
 
 
 ## DataFrame Glimpse
 
 ```
-Rows: 7467730
+Rows: 4
 Columns: 8
-$ permno               <i64> 10026
-$ permco               <i64> 7976
-$ ticker               <str> 'JJSF'
-$ primaryexch          <str> 'Q'
-$ date        <datetime[ns]> 2021-10-01 00:00:00
-$ dlycap               <f64> 2932065.76
-$ dlyopen              <f64> 153.85
-$ dlyclose             <f64> 153.64
+$ Portfolio                        <str> 'Sample Summary'
+$ Initial Reaction Hit Rate (%)    <f64> null
+$ Initial Reaction Mean Return (%) <f64> null
+$ Drift Hit Rate (%)               <f64> null
+$ Drift Mean Return (%)            <f64> null
+$ Drift Sharpe Ratio               <f64> null
+$ Trading Days                     <i64> 670
+$ Firm-Day Observations            <f64> 112092.0
 
 
 ```
@@ -24,16 +24,16 @@ $ dlyclose             <f64> 153.64
 
 | Dataframe Name                 |                                                    |
 |--------------------------------|--------------------------------------------------------------------------------------|
-| Dataframe ID                   | [crsp_daily_stock](../dataframes/SL&TH/crsp_daily_stock.md)                                       |
-| Data Sources                   | WRDS                                        |
-| Data Providers                 | CRSP                                      |
+| Dataframe ID                   | [table1_paper_sample](../dataframes/SL&TH/table1_paper_sample.md)                                       |
+| Data Sources                   | CRSP, RavenPack, OpenAI                                        |
+| Data Providers                 | WRDS, OpenAI                                      |
 | Links to Providers             |                              |
 | Topic Tags                     |                                           |
 | Type of Data Access            |                                   |
-| How is data pulled?            | src/pull_CRSP_stock.py                                                    |
-| Data available up to (min)     | N/A (large file)                                                             |
-| Data available up to (max)     | N/A (large file)                                                             |
-| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_data/CRSP_stock_daily.parquet                                                   |
+| How is data pulled?            | src/create_table1.py                                                    |
+| Data available up to (min)     | None                                                             |
+| Data available up to (max)     | None                                                             |
+| Dataframe Path                 | /home/tomhi/finmath/finm-32900/p05_lopez-lira_tang_2023/_output/table1_overnight_paper_sample.csv                                                   |
 
 
 **Linked Charts:**
